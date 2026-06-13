@@ -4,7 +4,9 @@
 
 This document defines the backend architecture for the public-source reputational screening agent built at the Agent Forge hackathon. The design is intentionally scoped for a one-day build, with production-grade patterns called out where they matter — particularly around auditability, error handling, and the deterministic rubric introduced in the schema design.
 
-The backend has five distinct stages that run in sequence: subject preparation, web data collection, sandbox processing, LLM reasoning, and rule-based assessment. Each stage is isolated, idempotent, and produces a checkpoint, so the pipeline can resume or be replayed from any step. The model is responsible only for classification against a fixed rubric; all final risk bands and disposition decisions are computed deterministically in code.[1][2]
+The backend runs six sequential stages: subject preparation, **entity resolution (Stage 1.5)**, web data collection, sandbox processing, LLM reasoning, and rule-based assessment. Each stage is isolated, idempotent, and produces a checkpoint, so the pipeline can resume or be replayed from any step — including pausing for analyst clarification when entity identity is ambiguous. The model is responsible only for classification against a fixed rubric; all final risk bands and disposition decisions are computed deterministically in code.[1][2]
+
+Report output conforms to [`schemas/reputation-screening-report-rubric.schema.v1.json`](schemas/reputation-screening-report-rubric.schema.v1.json). See [`examples/example-profile.json`](examples/example-profile.json) for a trimmed sample.
 
 ***
 
@@ -26,17 +28,18 @@ The backend has five distinct stages that run in sequence: subject preparation, 
           ┌────────────────────────▼───────────────────────────────┐
           │  Pipeline Orchestrator  (orchestrator.py)               │
           │                                                         │
-          │  Stage 1: Subject Prep    → checkpoint_1.json          │
-          │  Stage 2: Data Collection → checkpoint_2.json          │
-          │  Stage 3: Sandbox Process → checkpoint_3.json          │
-          │  Stage 4: LLM Reasoning   → checkpoint_4.json          │
-          │  Stage 5: Rule Engine     → final_report.json          │
+          │  Stage 1: Subject Prep       → checkpoint_subject_prep.json      │
+          │  Stage 1.5: Entity Resolution → checkpoint_entity_resolution.json │
+          │  Stage 2: Data Collection    → checkpoint_data_collection.json    │
+          │  Stage 3: Sandbox Process    → checkpoint_sandbox_processing.json │
+          │  Stage 4: LLM Reasoning      → checkpoint_llm_reasoning.json     │
+          │  Stage 5: Rule Engine        → final_report.json                   │
           └─────┬────────────────┬──────────────────┬──────────────┘
                 │                │                  │
       ┌─────────▼──┐   ┌─────────▼──┐    ┌──────────▼──────────┐
-      │ Bright Data │   │  Daytona   │    │  Kimi API            │
-      │ SERP API    │   │  Sandbox   │    │  (moonshotai/        │
-      │ Web Unlocker│   │  Python SDK│    │   Kimi-K2-Instruct)  │
+      │ Bright Data │   │  Daytona   │    │  LLM (TokenRouter /   │
+      │ SERP +      │   │  Sandbox   │    │  OpenRouter / Kimi)  │
+      │ Browser API │   │  Python SDK│    │  OpenAI-compatible   │
       └────────────┘   └────────────┘    └────────────────────┘
 ```
 
@@ -302,11 +305,13 @@ TIER_2_DOMAINS = [
 
 ***
 
-## Stage 4 — LLM Reasoning (Kimi)
+## Stage 4 — LLM Reasoning (TokenRouter / OpenRouter / Kimi)
 
 **Responsibility:** Classify each processed evidence item using the defined rubric. The model does NOT determine the overall risk level — that is the rule engine's job.
 
-**Model:** `moonshotai/Kimi-K2-Instruct` via the Kimi API (OpenAI-compatible endpoint).[16][17]
+**Providers:** Configured via `LLM_PROVIDER` in `backend/.env`. Default is **TokenRouter** at `https://api.tokenrouter.com/v1` using the OpenAI `chat.completions` API (model `MiniMax-M3`). Alternatives: OpenRouter (`minimax-v3`) or direct Kimi (`moonshotai/Kimi-K2-Instruct`).[16][17]
+
+**Batching:** Large evidence sets are classified in batches (default 5 items per call) to avoid truncated JSON responses.
 
 **Critical design principle: constrain the LLM's scope**
 
@@ -727,26 +732,43 @@ backend/
 ├── orchestrator.py          # run_pipeline, run_or_load, stage dispatch
 ├── stages/
 │   ├── stage1_subject.py    # Subject prep and query generation
-│   ├── stage2_collect.py    # Bright Data calls
-│   ├── stage3_sandbox.py    # Daytona SDK wrapper
-│   ├── stage4_llm.py        # Kimi API, Pydantic validation
-│   └── stage5_rules.py      # Rule engine, deterministic aggregation
+│   ├── stage1b_resolve.py   # Entity resolution + clarification gate
+│   ├── stage2_collect.py    # Bright Data SERP + Browser API
+│   ├── stage3_sandbox.py    # Daytona SDK wrapper (local fallback)
+│   ├── stage4_llm.py        # Rubric classification (batched)
+│   ├── stage5_rules.py      # Rule engine, deterministic aggregation
+│   ├── llm_client.py        # TokenRouter / OpenRouter / Kimi client
+│   └── browser_fetch.py     # Playwright page fetch for Browser API
 ├── processing/
 │   └── process.py           # Script uploaded to Daytona sandbox
 ├── schemas/
-│   ├── rubric.py            # Pydantic models matching JSON schema
-│   └── report.py            # Full report Pydantic model
-├── config/
-│   ├── source_tiers.json    # Domain → tier mapping
-│   └── rules_v1.json        # Rule IDs and descriptions (documentation)
+│   ├── rubric.py            # Pydantic enums and rubric types
+│   ├── report.py            # Full report Pydantic model
+│   └── resolution.py        # Entity resolution / clarification models
+├── config.py                # Settings from .env
+├── logging_config.py        # Rotating file + stdout logging
+├── validate_report.py       # Pydantic + JSON Schema validation
+├── scripts/
+│   └── seed_demo.py         # Pre-seeded DEMO-* runs for replay
 ├── runs/
 │   └── {run_id}/
+│       ├── status.json
 │       ├── checkpoint_subject_prep.json
+│       ├── checkpoint_entity_resolution.json
 │       ├── checkpoint_data_collection.json
 │       ├── checkpoint_sandbox_processing.json
 │       ├── checkpoint_llm_reasoning.json
+│       ├── checkpoint_rule_engine.json
 │       └── final_report.json
 └── requirements.txt
+
+docs/
+├── architecture.md          # This document
+├── integration.md           # Frontend ↔ backend guide
+├── schemas/
+│   └── reputation-screening-report-rubric.schema.v1.json
+└── examples/
+    └── example-profile.json
 ```
 
 ***
@@ -754,15 +776,30 @@ backend/
 ## Environment Variables
 
 ```bash
+# Bright Data (SERP + Browser API)
 BRIGHT_DATA_API_KEY=...
 BRIGHT_DATA_SERP_ZONE=serp_api
-BRIGHT_DATA_UNLOCKER_ZONE=unlocker
+BRIGHT_DATA_BROWSER_USERNAME=...
+BRIGHT_DATA_BROWSER_PASSWORD=...
+
+# LLM (default: TokenRouter OpenAI-compatible)
+LLM_PROVIDER=tokenrouter
+TOKENROUTER_API_KEY=...
+TOKENROUTER_BASE_URL=https://api.tokenrouter.com/v1
+TOKENROUTER_MODEL=MiniMax-M3
+
+# Entity resolution
+CLARIFICATION_ENABLED=true
+DISCOVERY_SERP_RESULTS=5
+
+# Optional
 DAYTONA_API_KEY=...
-KIMI_API_KEY=...
-KIMI_BASE_URL=https://api.moonshot.cn/v1
-KIMI_MODEL=moonshotai/Kimi-K2-Instruct
+LOG_LEVEL=INFO
+LOG_FILE=logs/pipeline.log
 RUNS_DIR=./runs
 ```
+
+See `backend/.env.example` for the full list including OpenRouter and Kimi overrides.
 
 ***
 
@@ -772,7 +809,7 @@ For the hackathon demo, having pre-computed checkpoint files for a known test ca
 
 1. Live: submit the subject via the frontend.
 2. Live: show Stages 1–2 completing (or fast-forward using a pre-populated cache hit).
-3. Live: show Stage 4 Kimi call completing and producing rubric classifications.
+3. Live: show Stage 4 LLM call completing and producing rubric classifications.
 4. Live: show the final report rendered in the frontend.
 
 The `run_or_load` checkpointing pattern already supports this — pre-seeding checkpoint files for a known `run_id` effectively creates a "fast replay" mode without any code changes.[22][2]

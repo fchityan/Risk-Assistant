@@ -11,7 +11,7 @@ Hackathon project: an automated **public-source reputational screening** pipelin
 5. **LLM classification** — rubric scoring per evidence item (TokenRouter / OpenRouter / Kimi)
 6. **Rule engine** — deterministic support bands, risk level, disposition, final report
 
-Reports conform to `reputation-screening-report-rubric.schema.v1.json`. See `example-profile.json` for a sample output shape.
+Reports conform to [`docs/schemas/reputation-screening-report-rubric.schema.v1.json`](docs/schemas/reputation-screening-report-rubric.schema.v1.json). See [`docs/examples/example-profile.json`](docs/examples/example-profile.json) for a sample output shape.
 
 ## Quick start (full stack)
 
@@ -30,6 +30,15 @@ python -m uvicorn main:app --reload --port 8000
 ```bash
 cd frontend
 cp .env.example .env
+pip install -r requirements.txt
+streamlit run app.py --server.port 8501
+```
+
+On **Windows PowerShell**, use `;` instead of `&&`, and `Copy-Item` instead of `cp`:
+
+```powershell
+cd frontend
+Copy-Item .env.example .env
 pip install -r requirements.txt
 streamlit run app.py --server.port 8501
 ```
@@ -62,10 +71,14 @@ Status flow: `queued` → `running` → `clarification_required` → `running` �
 ```
 hackathon-dd-agent/
 ├── README.md
-├── docs/integration.md              # frontend ↔ backend guide
-├── backend-architecture.md
-├── reputation-screening-report-rubric.schema.v1.json
-├── example-profile.json
+├── docs/
+│   ├── README.md                    # documentation index
+│   ├── architecture.md              # pipeline design
+│   ├── integration.md               # frontend ↔ backend
+│   ├── schemas/
+│   │   └── reputation-screening-report-rubric.schema.v1.json
+│   └── examples/
+│       └── example-profile.json
 ├── backend/                         # FastAPI screening pipeline
 │   ├── main.py
 │   ├── orchestrator.py
@@ -89,10 +102,11 @@ See [backend/README.md](backend/README.md) and [frontend/README.md](frontend/REA
 
 ## Documentation
 
+- [docs/README.md](docs/README.md) — index of all docs, schemas, and examples
 - [docs/integration.md](docs/integration.md) — run both services, API contract, report mapping
+- [docs/architecture.md](docs/architecture.md) — pipeline stages and checkpoints
 - [backend/README.md](backend/README.md) — endpoints, env, demo, logging
 - [frontend/README.md](frontend/README.md) — UI setup and modules
-- [backend-architecture.md](backend-architecture.md) — pipeline stages
 
 Validate a report:
 

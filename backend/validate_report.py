@@ -9,7 +9,7 @@ import jsonschema
 from schemas.report import ReputationScreeningReport
 
 ROOT = Path(__file__).resolve().parent.parent
-SCHEMA_PATH = ROOT / "reputation-screening-report-rubric.schema.v1.json"
+SCHEMA_PATH = ROOT / "docs" / "schemas" / "reputation-screening-report-rubric.schema.v1.json"
 
 
 def validate_report_file(report_path: Path) -> None:

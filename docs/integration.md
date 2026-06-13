@@ -39,6 +39,15 @@ pip install -r requirements.txt
 streamlit run app.py --server.port 8501
 ```
 
+Windows PowerShell:
+
+```powershell
+cd frontend
+Copy-Item .env.example .env
+pip install -r requirements.txt
+streamlit run app.py --server.port 8501
+```
+
 Verify:
 
 - Backend: `GET http://localhost:8000/health`
@@ -89,7 +98,7 @@ Content-Type: application/json
 
 ## Report shape
 
-The backend returns a **v1 reputational screening report** (see `reputation-screening-report-rubric.schema.v1.json` at repo root).
+The backend returns a **v1 reputational screening report** (see [`schemas/reputation-screening-report-rubric.schema.v1.json`](schemas/reputation-screening-report-rubric.schema.v1.json)).
 
 The UI does not consume that schema directly. `frontend/report_adapter.py` maps it to a view model with:
 
@@ -134,4 +143,5 @@ If you embed a browser SPA later, enable CORS on `backend/main.py` (already allo
 
 - [backend/README.md](../backend/README.md) — pipeline, env, logging
 - [frontend/README.md](../frontend/README.md) — UI modules
-- [backend-architecture.md](../backend-architecture.md) — stage design
+- [architecture.md](architecture.md) — stage design
+- [README.md](README.md) — documentation index

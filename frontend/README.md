@@ -78,4 +78,4 @@ Subject type mapping (UI label → API):
 - **401 on screening** — check `backend/.env` LLM keys (`TOKENROUTER_BASE_URL`, `MiniMax-M3`)
 - **Empty dashboard** — confirm `mock_data/mock_data.json` exists or run completed successfully
 
-Full stack guide: [docs/integration.md](../docs/integration.md)
+Full stack guide: [docs/integration.md](../docs/integration.md) · Architecture: [docs/architecture.md](../docs/architecture.md)

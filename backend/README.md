@@ -136,6 +136,8 @@ python scripts/seed_demo.py
 
 ## Validation
 
+Validates against Pydantic models in `schemas/` and the JSON Schema in `docs/schemas/reputation-screening-report-rubric.schema.v1.json`.
+
 ```bash
 python validate_report.py runs/DEMO-ORION-001/final_report.json
 ```
