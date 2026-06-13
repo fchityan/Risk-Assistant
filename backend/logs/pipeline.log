@@ -374,3 +374,26 @@ tokenrouter.AuthenticationError: Error code: 401 - {'message': 'Unauthenticated.
 2026-06-13 16:08:58,759 INFO [stages.stage4_llm] LLM classifying batch 11-15 of 56 items
 2026-06-13 16:09:32,003 INFO [stages.stage4_llm] LLM classifying batch 16-20 of 56 items
 2026-06-13 16:10:02,142 INFO [stages.stage4_llm] LLM classifying batch 21-25 of 56 items
+2026-06-13 16:10:36,972 INFO [stages.stage4_llm] LLM classifying batch 26-30 of 56 items
+2026-06-13 16:11:05,076 WARNING [stages.stage4_llm] LLM classification validation attempt 1: EV-028: 1 validation error for EvidenceClassification
+risk_categories.1
+  Input should be 'fraud', 'financial_crime', 'sanctions', 'regulatory', 'litigation', 'corruption', 'political_exposure', 'reputational', 'adverse_media', 'ownership_opacity', 'identity_mismatch' or 'other' [type=enum, input_value='investigation', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.13/v/enum
+2026-06-13 16:11:24,212 INFO [stages.stage4_llm] LLM classifying batch 31-35 of 56 items
+2026-06-13 16:12:08,858 INFO [stages.stage4_llm] LLM classifying batch 36-40 of 56 items
+2026-06-13 16:12:44,923 INFO [stages.stage4_llm] LLM classifying batch 41-45 of 56 items
+2026-06-13 16:13:13,290 INFO [stages.stage4_llm] LLM classifying batch 46-50 of 56 items
+2026-06-13 16:14:05,221 WARNING [stages.stage4_llm] LLM classification validation attempt 1: EV-048: 1 validation error for EvidenceClassification
+risk_categories.0
+  Input should be 'fraud', 'financial_crime', 'sanctions', 'regulatory', 'litigation', 'corruption', 'political_exposure', 'reputational', 'adverse_media', 'ownership_opacity', 'identity_mismatch' or 'other' [type=enum, input_value='safety', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.13/v/enum; EV-050: 1 validation error for EvidenceClassification
+risk_categories.0
+  Input should be 'fraud', 'financial_crime', 'sanctions', 'regulatory', 'litigation', 'corruption', 'political_exposure', 'reputational', 'adverse_media', 'ownership_opacity', 'identity_mismatch' or 'other' [type=enum, input_value='safety', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.13/v/enum
+2026-06-13 16:14:48,606 INFO [stages.stage4_llm] LLM classifying batch 51-55 of 56 items
+2026-06-13 16:15:29,397 INFO [stages.stage4_llm] LLM classifying batch 56-56 of 56 items
+2026-06-13 16:15:46,563 INFO [stages.stage4_llm] LLM classified 56 evidence items
+2026-06-13 16:15:46,722 INFO [orchestrator] [RSR-20260613-006] status=running stage=rule_engine
+2026-06-13 16:15:46,844 INFO [orchestrator] [RSR-20260613-006] final_report.json written
+2026-06-13 16:15:46,846 INFO [orchestrator] [RSR-20260613-006] status=complete stage=rule_engine
+2026-06-13 16:21:33,352 INFO [main] API starting agent_version=0.1.0-hackathon log_level=INFO llm_provider=tokenrouter
