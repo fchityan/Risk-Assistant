@@ -60,8 +60,8 @@ class Settings(BaseSettings):
     # LLM Stage 4 — provider: tokenrouter (default), openrouter, or kimi
     llm_provider: str = "tokenrouter"
     tokenrouter_api_key: str = ""
-    tokenrouter_model: str = "minimax-v3"
-    tokenrouter_environment: str = "production"
+    tokenrouter_base_url: str = "https://api.tokenrouter.com/v1"
+    tokenrouter_model: str = "MiniMax-M3"
     openrouter_api_key: str = ""
     openrouter_model: str = "minimax-v3"
     openrouter_base_url: str = "https://openrouter.ai/api/v1"

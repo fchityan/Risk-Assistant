@@ -121,7 +121,7 @@ LLM Stage 4 providers (`LLM_PROVIDER`):
 
 | Provider | Key env vars | Model env |
 |----------|--------------|-----------|
-| `tokenrouter` (default) | `TOKENROUTER_API_KEY` (`tr_...`) | `TOKENROUTER_MODEL=minimax-v3` |
+| `tokenrouter` (default) | `TOKENROUTER_API_KEY` | `TOKENROUTER_MODEL=MiniMax-M3` |
 | `openrouter` | `OPENROUTER_API_KEY` | `OPENROUTER_MODEL=minimax-v3` |
 | `kimi` | `KIMI_API_KEY` + `KIMI_BASE_URL` | `KIMI_MODEL` |
 
@@ -149,4 +149,6 @@ Pipeline and API logs go to stdout and `backend/logs/pipeline.log` (rotating, 5 
 | `LOG_LEVEL` | `INFO` | `DEBUG`, `INFO`, `WARNING`, `ERROR` |
 | `LOG_FILE` | `logs/pipeline.log` | Set empty to disable file logging |
 
-Log lines include `run_id` (e.g. `[RSR-20260613-001]`) for stage boundaries, status changes, SERP/Browser/LLM failures, and full tracebacks on pipeline errors. TokenRouter auth issues log a key-prefix hint (`tr_...` expected) without exposing secrets.
+Log lines include `run_id` (e.g. `[RSR-20260613-001]`) for stage boundaries, status changes, SERP/Browser/LLM failures, and full tracebacks on pipeline errors.
+
+TokenRouter uses the OpenAI-compatible endpoint `https://api.tokenrouter.com/v1` with `chat.completions.create` (not the legacy `tokenrouter` Python SDK).

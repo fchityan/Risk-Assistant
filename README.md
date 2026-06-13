@@ -82,7 +82,7 @@ hackathon-dd-agent/
 Copy `backend/.env.example` to `backend/.env`. Minimum for a live run:
 
 - **Bright Data** — `BRIGHT_DATA_API_KEY`, `BRIGHT_DATA_SERP_ZONE`, Browser credentials
-- **LLM** — `LLM_PROVIDER` + provider key (`TOKENROUTER_API_KEY` must be `tr_...` for TokenRouter)
+- **LLM** — `LLM_PROVIDER` + `TOKENROUTER_API_KEY` (OpenAI-compatible API at `api.tokenrouter.com`)
 
 Full variable list and troubleshooting: [backend/README.md](backend/README.md).
 

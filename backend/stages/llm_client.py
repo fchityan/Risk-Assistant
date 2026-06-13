@@ -3,7 +3,6 @@
 import json
 import re
 from enum import Enum
-from typing import Any
 
 from openai import OpenAI
 
@@ -19,6 +18,12 @@ PLACEHOLDER_LLM_KEYS = frozenset(
         "YOUR_TOKENROUTER_API_KEY_HERE",
     }
 )
+
+# Legacy env model names → TokenRouter OpenAI-compatible API model ids
+TOKENROUTER_MODEL_ALIASES = {
+    "minimax-v3": "MiniMax-M3",
+    "minimax_m3": "MiniMax-M3",
+}
 
 
 class LlmProvider(str, Enum):
@@ -48,6 +53,11 @@ def llm_configured() -> bool:
     return _is_real_key(settings.tokenrouter_api_key)
 
 
+def _resolve_tokenrouter_model(model: str) -> str:
+    key = model.strip()
+    return TOKENROUTER_MODEL_ALIASES.get(key.lower(), key)
+
+
 def active_llm_model() -> str:
     settings = get_settings()
     provider = _provider()
@@ -55,51 +65,50 @@ def active_llm_model() -> str:
         return settings.kimi_model
     if provider == LlmProvider.openrouter:
         return settings.openrouter_model
-    return settings.tokenrouter_model
-
-
-def _warn_key_format(provider: LlmProvider) -> None:
-    settings = get_settings()
-    if provider == LlmProvider.tokenrouter:
-        key = settings.tokenrouter_api_key
-        if _is_real_key(key) and not key.startswith("tr_"):
-            logger.warning(
-                "TokenRouter key prefix is %s; expected tr_... — auth failures often mean wrong key type",
-                key_prefix_hint(key),
-            )
-    elif provider == LlmProvider.openrouter:
-        key = settings.openrouter_api_key
-        if _is_real_key(key) and not key.startswith("sk-"):
-            logger.warning(
-                "OpenRouter key prefix is %s; expected sk-...",
-                key_prefix_hint(key),
-            )
+    return _resolve_tokenrouter_model(settings.tokenrouter_model)
 
 
 def _strip_json_fence(text: str) -> str:
     stripped = text.strip()
+    stripped = re.sub(
+        r"<[^>]*thinking[^>]*>.*?</[^>]*thinking[^>]*>",
+        "",
+        stripped,
+        flags=re.I | re.S,
+    )
+    stripped = stripped.strip()
     if stripped.startswith("```"):
         stripped = re.sub(r"^```(?:json)?\s*", "", stripped)
         stripped = re.sub(r"\s*```$", "", stripped)
     return stripped.strip()
 
 
-def _extract_tokenrouter_text(response: Any) -> str:
-    output_text = getattr(response, "output_text", None)
-    if output_text:
-        return str(output_text)
-
-    parts: list[str] = []
-    output = getattr(response, "output", None) or []
-    for block in output:
-        content = block.get("content") if isinstance(block, dict) else getattr(block, "content", [])
-        for part in content or []:
-            if isinstance(part, dict):
-                if part.get("type") == "text" and part.get("text"):
-                    parts.append(str(part["text"]))
-            elif getattr(part, "type", None) == "text" and getattr(part, "text", None):
-                parts.append(str(part.text))
-    return "\n".join(parts)
+def _extract_json_text(raw: str) -> str:
+    cleaned = _strip_json_fence(raw)
+    try:
+        json.loads(cleaned)
+        return cleaned
+    except json.JSONDecodeError:
+        pass
+    start = cleaned.find("{")
+    end = cleaned.rfind("}")
+    if start >= 0 and end > start:
+        candidate = cleaned[start : end + 1]
+        try:
+            json.loads(candidate)
+            return candidate
+        except json.JSONDecodeError:
+            pass
+    start = cleaned.find("[")
+    end = cleaned.rfind("]")
+    if start >= 0 and end > start:
+        candidate = cleaned[start : end + 1]
+        try:
+            json.loads(candidate)
+            return candidate
+        except json.JSONDecodeError:
+            pass
+    return cleaned
 
 
 def _chat_complete_json(
@@ -133,7 +142,10 @@ def _chat_complete_json(
             response_format={"type": "json_object"},
         )
     except Exception as e:
-        logger.warning("LLM json_object mode failed (%s), retrying without response_format", type(e).__name__)
+        logger.warning(
+            "LLM json_object mode failed (%s), retrying without response_format",
+            type(e).__name__,
+        )
         try:
             response = client.chat.completions.create(**common)
         except Exception:
@@ -145,38 +157,29 @@ def _chat_complete_json(
 
 def _complete_via_tokenrouter(system_prompt: str, user_prompt: str) -> str:
     settings = get_settings()
-    from tokenrouter import Tokenrouter
-
+    model = _resolve_tokenrouter_model(settings.tokenrouter_model)
     logger.debug(
-        "TokenRouter request model=%s env=%s key=%s",
-        settings.tokenrouter_model,
-        settings.tokenrouter_environment,
+        "TokenRouter OpenAI-compatible request base_url=%s model=%s key=%s",
+        settings.tokenrouter_base_url,
+        model,
         key_prefix_hint(settings.tokenrouter_api_key),
     )
-    client = Tokenrouter(
-        api_key=settings.tokenrouter_api_key,
-        environment=settings.tokenrouter_environment,
-    )
     try:
-        response = client.responses.create(
-            model=settings.tokenrouter_model,
-            instructions=system_prompt,
-            input=user_prompt,
-            temperature=0.1,
-            max_output_tokens=settings.llm_max_output_tokens,
+        return _chat_complete_json(
+            base_url=settings.tokenrouter_base_url,
+            api_key=settings.tokenrouter_api_key,
+            model=model,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
         )
     except Exception:
         logger.exception(
-            "TokenRouter API error model=%s env=%s key=%s",
-            settings.tokenrouter_model,
-            settings.tokenrouter_environment,
+            "TokenRouter API error base_url=%s model=%s key=%s",
+            settings.tokenrouter_base_url,
+            model,
             key_prefix_hint(settings.tokenrouter_api_key),
         )
         raise
-    text = _extract_tokenrouter_text(response)
-    if not text:
-        raise ValueError("TokenRouter returned empty response text")
-    return _strip_json_fence(text)
 
 
 def _complete_via_openrouter(system_prompt: str, user_prompt: str) -> str:
@@ -212,8 +215,12 @@ def complete_json(system_prompt: str, user_prompt: str) -> str:
         logger.error("LLM not configured for provider=%s", provider.value)
         raise RuntimeError(f"LLM not configured for provider={provider.value}")
 
-    _warn_key_format(provider)
-    logger.debug("LLM complete_json provider=%s model=%s prompt_chars=%d", provider.value, model, len(user_prompt))
+    logger.debug(
+        "LLM complete_json provider=%s model=%s prompt_chars=%d",
+        provider.value,
+        model,
+        len(user_prompt),
+    )
 
     try:
         if provider == LlmProvider.kimi:
@@ -228,7 +235,7 @@ def complete_json(system_prompt: str, user_prompt: str) -> str:
 
 def parse_json_object(raw: str) -> dict | list:
     try:
-        return json.loads(_strip_json_fence(raw))
+        return json.loads(_extract_json_text(raw))
     except json.JSONDecodeError as e:
         logger.error("LLM response JSON parse failed: %s preview=%s", e, raw[:200])
         raise

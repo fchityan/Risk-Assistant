@@ -21,11 +21,13 @@ logger = get_logger(__name__)
 SYSTEM_PROMPT = """
 You are a compliance screening analyst assistant.
 Your task is to classify each evidence item using the provided rubric.
-You must output ONLY a valid JSON object with an "items" array. No preamble, no explanation, no markdown.
+You must output ONLY a valid JSON object with an "items" array. No preamble, no explanation, no markdown, no thinking tags.
 Classify each item strictly against the rubric definitions provided.
 Never invent findings not present in the provided text.
 If a component cannot be determined from the text, default to the lowest band.
 """
+
+CLASSIFICATION_BATCH_SIZE = 5
 
 RUBRIC_DEFINITIONS = """
 entity_match:
@@ -139,20 +141,10 @@ def _validate_classifications(raw_items: list[dict]) -> tuple[list[EvidenceClass
     return validated, None
 
 
-def classify_evidence_items(
+def _classify_batch(
     processed_items: list[dict],
     subject: dict,
 ) -> list[EvidenceClassification]:
-    if not processed_items:
-        return []
-
-    if not llm_configured():
-        logger.warning("LLM not configured; using conservative classifications for %d items", len(processed_items))
-        return [
-            _conservative_classification(item["evidence_id"])
-            for item in processed_items
-        ]
-
     error_hint: str | None = None
     validated: list[EvidenceClassification] = []
 
@@ -169,24 +161,47 @@ def classify_evidence_items(
         validated, error_hint = _validate_classifications(parsed_items)
 
         if error_hint is None and len(validated) == len(processed_items):
-            logger.info("LLM classified %d evidence items", len(validated))
             return validated
 
         logger.warning("LLM classification validation attempt %d: %s", attempt + 1, error_hint)
-
         if attempt == 1:
             break
 
-    logger.warning(
-        "LLM classification incomplete; filling %d items with conservative defaults",
-        len(processed_items) - len(validated),
-    )
     by_id = {c.evidence_id: c for c in validated}
     result: list[EvidenceClassification] = []
     for item in processed_items:
         eid = item["evidence_id"]
         result.append(by_id.get(eid, _conservative_classification(eid)))
     return result
+
+
+def classify_evidence_items(
+    processed_items: list[dict],
+    subject: dict,
+) -> list[EvidenceClassification]:
+    if not processed_items:
+        return []
+
+    if not llm_configured():
+        logger.warning("LLM not configured; using conservative classifications for %d items", len(processed_items))
+        return [
+            _conservative_classification(item["evidence_id"])
+            for item in processed_items
+        ]
+
+    all_results: list[EvidenceClassification] = []
+    for start in range(0, len(processed_items), CLASSIFICATION_BATCH_SIZE):
+        batch = processed_items[start : start + CLASSIFICATION_BATCH_SIZE]
+        logger.info(
+            "LLM classifying batch %d-%d of %d items",
+            start + 1,
+            start + len(batch),
+            len(processed_items),
+        )
+        all_results.extend(_classify_batch(batch, subject))
+
+    logger.info("LLM classified %d evidence items", len(all_results))
+    return all_results
 
 
 def run_stage4(checkpoint3: dict) -> dict:
