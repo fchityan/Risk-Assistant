@@ -204,6 +204,13 @@ def _classify_batch(
         if attempt == 1:
             break
 
+    if len(validated) < len(processed_items):
+        logger.warning(
+            "LLM returned %d classifications for %d items; missing items use conservative defaults",
+            len(validated),
+            len(processed_items),
+        )
+
     by_id = {c.evidence_id: c for c in validated}
     result: list[EvidenceClassification] = []
     for item in processed_items:

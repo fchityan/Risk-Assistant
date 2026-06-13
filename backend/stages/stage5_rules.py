@@ -493,11 +493,12 @@ def assemble_report(checkpoint4: dict) -> ReputationScreeningReport:
 
     support_summary_dict = case_result["determination_basis"]["support_summary"]
     triggered_rules_list = case_result["determination_basis"]["triggered_rules"]
+    disposition_rationale = _build_disposition_rationale(case_result["recommended_disposition"])
     memo_text = _build_memo(
         subject,
         overall_summary,
         case_result["recommended_disposition"],
-        _build_disposition_rationale(case_result["recommended_disposition"]),
+        disposition_rationale,
         support_summary_dict,
         triggered_rules_list,
         risk_flags,
@@ -509,7 +510,7 @@ def assemble_report(checkpoint4: dict) -> ReputationScreeningReport:
         coverage_assessment=coverage,
         coverage_notes=coverage_notes,
         recommended_disposition=RecommendedDisposition(case_result["recommended_disposition"]),
-        disposition_rationale=_build_disposition_rationale(case_result["recommended_disposition"]),
+        disposition_rationale=disposition_rationale,
         determination_basis=DeterminationBasis(
             method=DeterminationMethod.rule_based_v1,
             support_summary=SupportSummary(**support_summary_dict),

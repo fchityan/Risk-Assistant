@@ -54,6 +54,22 @@ def _truncate_caption(text: str, max_len: int = 72) -> str:
     return text[: max_len - 3] + "..."
 
 
+def _clarification_country_default(candidates: list[dict]) -> str:
+    for candidate in candidates:
+        value = (candidate.get("country") or "").strip()
+        if value:
+            return value
+    return ""
+
+
+def _clarification_industry_default(candidates: list[dict]) -> str:
+    for candidate in candidates:
+        value = (candidate.get("industry") or "").strip()
+        if value:
+            return value
+    return ""
+
+
 if "ui_data" not in st.session_state:
     st.session_state.ui_data = load_report_from_path(DEFAULT_DATA_PATH)
 if "polling" not in st.session_state:
@@ -62,19 +78,29 @@ if "clarification_pending" not in st.session_state:
     st.session_state.clarification_pending = None
 if "active_run_id" not in st.session_state:
     st.session_state.active_run_id = None
+if "last_poll_time" not in st.session_state:
+    st.session_state.last_poll_time = 0.0
 
-# Non-blocking status poll (one GET per rerun; UI stays responsive with stage updates)
+POLL_YIELD_SECONDS = 0.5
+
+# Non-blocking status poll (time-gated; short yield between reruns, no multi-second sleep)
 if st.session_state.polling and not SETTINGS["use_mock_data"]:
     run_id = st.session_state.active_run_id
     deadline = st.session_state.get("poll_deadline", 0)
+    now = time.time()
+    poll_interval = SETTINGS["poll_interval_seconds"]
     if not run_id:
         st.session_state.polling = False
-    elif time.time() > deadline:
+    elif now > deadline:
         st.session_state.polling = False
         st.error(f"Screening run {run_id} timed out after {SETTINGS['poll_timeout_seconds']}s.")
+    elif now - st.session_state.last_poll_time < poll_interval:
+        time.sleep(POLL_YIELD_SECONDS)
+        st.rerun()
     else:
         try:
             status = get_screen_status(SETTINGS["backend_url"], run_id)
+            st.session_state.last_poll_time = now
             state = status.get("status")
             if state == "complete":
                 report = status.get("report")
@@ -94,7 +120,7 @@ if st.session_state.polling and not SETTINGS["use_mock_data"]:
             else:
                 stage = status.get("stage") or "running"
                 st.info(f"Run {run_id}: {state} — stage: {stage}")
-                time.sleep(SETTINGS["poll_interval_seconds"])
+                time.sleep(POLL_YIELD_SECONDS)
                 st.rerun()
         except Exception as exc:
             st.session_state.polling = False
@@ -802,6 +828,7 @@ if run_screening:
             st.session_state.active_run_id = run_id
             st.session_state.polling = True
             st.session_state.poll_deadline = time.time() + SETTINGS["poll_timeout_seconds"]
+            st.session_state.last_poll_time = 0.0
             st.session_state.clarification_pending = None
             st.rerun()
         except Exception as exc:
@@ -812,12 +839,14 @@ if st.session_state.get("clarification_pending"):
     clar_run_id = clar_payload.get("run_id") or st.session_state.active_run_id
     clar_form = clar_payload.get("clarification_form") or {}
     candidates = clar_form.get("candidate_entities") or []
+    default_clar_country = _clarification_country_default(candidates)
+    default_clar_industry = _clarification_industry_default(candidates)
 
     st.warning("Entity identity is ambiguous. Provide clarification to continue screening.")
 
     with st.form("clarification_form"):
-        clar_country = st.text_input("Country", value=country or "")
-        clar_industry = st.text_input("Industry", value="")
+        clar_country = st.text_input("Country", value=default_clar_country)
+        clar_industry = st.text_input("Industry", value=default_clar_industry)
         candidate_labels = [
             f"{c.get('name', 'Candidate')} ({c.get('country', 'unknown')}) — {c.get('why_shown', '')}"
             for c in candidates
@@ -849,6 +878,7 @@ if st.session_state.get("clarification_pending"):
             st.session_state.active_run_id = clar_run_id
             st.session_state.polling = True
             st.session_state.poll_deadline = time.time() + SETTINGS["poll_timeout_seconds"]
+            st.session_state.last_poll_time = 0.0
             st.session_state.last_success = f"Clarification submitted for {clar_run_id}; resuming pipeline..."
             st.rerun()
         except Exception as exc:

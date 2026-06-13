@@ -1,6 +1,7 @@
 """Pipeline orchestrator with checkpointing."""
 
 import json
+import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,6 +18,10 @@ from stages.stage4_llm import run_stage4
 from stages.stage5_rules import run_stage5
 
 logger = get_logger(__name__)
+
+_run_id_lock = threading.Lock()
+_status_locks_guard = threading.Lock()
+_status_locks: dict[str, threading.Lock] = {}
 
 STAGE_FILES = {
     "subject_prep": "checkpoint_subject_prep.json",
@@ -42,10 +47,23 @@ def ensure_runs_dir() -> Path:
 
 def generate_run_id() -> str:
     ts = datetime.now(timezone.utc).strftime("%Y%m%d")
+    prefix = f"RSR-{ts}-"
     runs_dir = ensure_runs_dir()
-    existing = list(runs_dir.glob(f"RSR-{ts}-*"))
-    seq = len(existing) + 1
-    return f"RSR-{ts}-{seq:03d}"
+
+    with _run_id_lock:
+        max_seq = 0
+        for path in runs_dir.glob(f"{prefix}*"):
+            suffix = path.name[len(prefix):]
+            if suffix.isdigit():
+                max_seq = max(max_seq, int(suffix))
+
+        for seq in range(max_seq + 1, max_seq + 1000):
+            run_id = f"{prefix}{seq:03d}"
+            if not (runs_dir / run_id).exists():
+                get_run_dir(run_id)
+                return run_id
+
+    raise RuntimeError(f"Could not allocate unique run_id for {prefix}")
 
 
 def _atomic_write_json(path: Path, payload: dict) -> None:
@@ -88,6 +106,24 @@ def load_run_status(run_id: str) -> dict | None:
         return None
     with open(status_path, encoding="utf-8") as f:
         return json.load(f)
+
+
+def _get_status_lock(run_id: str) -> threading.Lock:
+    with _status_locks_guard:
+        if run_id not in _status_locks:
+            _status_locks[run_id] = threading.Lock()
+        return _status_locks[run_id]
+
+
+def claim_clarification_resume(run_id: str) -> bool:
+    """Atomically transition clarification_required -> running under per-run lock."""
+    lock = _get_status_lock(run_id)
+    with lock:
+        status = load_run_status(run_id)
+        if status is None or status.get("status") != "clarification_required":
+            return False
+        save_run_status(run_id, "running", stage="entity_resolution")
+        return True
 
 
 def save_final_report(run_id: str, report: dict) -> None:
@@ -233,6 +269,11 @@ def resume_pipeline(run_id: str, clarification: ClarificationRequest | dict) -> 
         run_dir = get_run_dir(run_id)
 
         cp1_path = run_dir / STAGE_FILES["subject_prep"]
+        if not cp1_path.exists():
+            raise FileNotFoundError(
+                f"Cannot resume run {run_id}: missing {STAGE_FILES['subject_prep']}. "
+                "The run directory may be incomplete or corrupted."
+            )
         with open(cp1_path, encoding="utf-8") as f:
             cp1 = json.load(f)
 

@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from config import get_settings
 from logging_config import configure_logging, get_logger
 from orchestrator import (
+    claim_clarification_resume,
     generate_run_id,
     load_final_report,
     load_run_status,
@@ -182,15 +183,18 @@ async def clarify_screening(
         logger.warning("POST /screen/%s/clarify run not found", run_id)
         raise HTTPException(status_code=404, detail="Run not found")
 
-    if status["status"] != "clarification_required":
+    claimed = await asyncio.to_thread(claim_clarification_resume, run_id)
+    if not claimed:
+        current = await asyncio.to_thread(load_run_status, run_id)
+        current_status = current.get("status") if current else "unknown"
         logger.warning(
             "[%s] clarify rejected current_status=%s",
             run_id,
-            status["status"],
+            current_status,
         )
         raise HTTPException(
             status_code=409,
-            detail=f"Run is not awaiting clarification (current status: {status['status']})",
+            detail=f"Run is not awaiting clarification (current status: {current_status})",
         )
 
     logger.info(
@@ -199,7 +203,6 @@ async def clarify_screening(
         clarification.country,
         clarification.candidate_id,
     )
-    save_run_status(run_id, "running", stage="entity_resolution")
     background_tasks.add_task(resume_pipeline, run_id, clarification)
     return {
         "run_id": run_id,

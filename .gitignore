@@ -16,6 +16,7 @@ venv/
 
 # Runtime data
 backend/runs/
+backend/logs/
 runs/
 
 # IDE
