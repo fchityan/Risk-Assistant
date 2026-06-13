@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 import pandas as pd
 import streamlit as st
 
@@ -9,7 +10,15 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-with open("mock_data/mock_data.json", "r") as f:
+base_dir = Path(__file__).resolve().parent
+candidate_paths = [
+    base_dir / "mock_data" / "mock_data.json",
+    base_dir / "mock_data.json",
+    base_dir / "frontend" / "mock_data" / "mock_data.json",
+]
+data_path = next((path for path in candidate_paths if path.exists()), candidate_paths[0])
+
+with data_path.open("r") as f:
     data = json.load(f)
 
 subject = data["subject"]
@@ -708,7 +717,7 @@ with m5:
 left, right = st.columns([2.55, 0.95])
 
 with left:
-        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
         ["Assessment", "Evidence", "Rubric", "Rules", "Memo", "Audit"]
     )
 

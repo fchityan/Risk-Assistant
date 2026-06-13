@@ -26,6 +26,12 @@ playwright install chromium   # Browser API page fetch
 python -m uvicorn main:app --reload --port 8000
 ```
 
+Frontend UI (Streamlit):
+
+```bash
+streamlit run frontend/app.py --server.headless true --server.port 8501
+```
+
 Health check: `GET http://localhost:8000/health`
 
 Start a run:
