@@ -1,0 +1,25 @@
+{
+  "rubric_version": "v1",
+  "support_band_rules": [
+    "EVIDENCE_HIGH_01: high entity match + tier 1/2 source + high/critical severity + high case linkage + (current recency OR multi_source corroboration)",
+    "EVIDENCE_HIGH_02: tier 1 source + medium/high entity match + high/critical severity + medium/high case linkage",
+    "EVIDENCE_MEDIUM_01: medium/high entity match + medium/high/critical severity + 2+ medium-support factors",
+    "EVIDENCE_LOW_01: default low support when no higher rule triggers"
+  ],
+  "case_risk_rules": [
+    "CASE_HIGH_01: critical adverse signal with high-support evidence",
+    "CASE_HIGH_02: two+ high-support items in material categories",
+    "CASE_HIGH_03: tier-1 source high-support finding",
+    "CASE_MEDIUM_01: medium/high-support finding in material category",
+    "CASE_MEDIUM_02: medium-support finding warrants review",
+    "CASE_LOW_01: no material adverse findings above low-support threshold"
+  ],
+  "material_categories": [
+    "fraud",
+    "financial_crime",
+    "sanctions",
+    "regulatory",
+    "corruption",
+    "litigation"
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "tier_1_domains": [
+    "reuters.com",
+    "bloomberg.com",
+    "ft.com",
+    "wsj.com",
+    "straitstimes.com",
+    "channelnewsasia.com",
+    "mas.gov.sg",
+    "acra.gov.sg",
+    "ojk.go.id",
+    "sgdi.gov.sg",
+    "judiciary.gov.sg"
+  ],
+  "tier_2_domains": [
+    "businesstimes.com.sg",
+    "theedgesingapore.com",
+    "asiaone.com",
+    "todayonline.com",
+    "insurancejournal.com",
+    "risk.net"
+  ],
+  "adverse_keywords": [
+    "fraud",
+    "investigation",
+    "corruption",
+    "sanction",
+    "regulatory",
+    "court",
+    "conviction",
+    "allegation",
+    "lawsuit",
+    "enforcement",
+    "criminal",
+    "bribery",
+    "money laundering",
+    "fine",
+    "penalty",
+    "indictment",
+    "scam"
+  ],
+  "registry_domains": [
+    "acra.gov.sg",
+    "mas.gov.sg",
+    "sgdi.gov.sg",
+    "judiciary.gov.sg"
+  ],
+  "court_domains": [
+    "judiciary.gov.sg",
+    "supremecourt.gov"
+  ]
+}
