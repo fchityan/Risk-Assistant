@@ -372,3 +372,5 @@ tokenrouter.AuthenticationError: Error code: 401 - {'message': 'Unauthenticated.
 2026-06-13 16:08:00,844 INFO [stages.stage4_llm] LLM classifying batch 1-5 of 56 items
 2026-06-13 16:08:37,180 INFO [stages.stage4_llm] LLM classifying batch 6-10 of 56 items
 2026-06-13 16:08:58,759 INFO [stages.stage4_llm] LLM classifying batch 11-15 of 56 items
+2026-06-13 16:09:32,003 INFO [stages.stage4_llm] LLM classifying batch 16-20 of 56 items
+2026-06-13 16:10:02,142 INFO [stages.stage4_llm] LLM classifying batch 21-25 of 56 items
