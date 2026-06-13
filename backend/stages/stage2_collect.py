@@ -6,8 +6,10 @@ from urllib.parse import quote_plus, urlparse
 
 import httpx
 
+from async_utils import run_coroutine_sync
 from config import get_settings
 from logging_config import get_logger
+from source_config import get_adverse_keywords
 from stages.browser_fetch import fetch_pages
 
 logger = get_logger(__name__)
@@ -15,28 +17,10 @@ logger = get_logger(__name__)
 # SERP API uses the Bright Data request endpoint (zone selects the product).
 REQUEST_URL = "https://api.brightdata.com/request"
 
-ADVERSE_KEYWORDS = [
-    "fraud",
-    "investigation",
-    "corruption",
-    "sanction",
-    "regulatory",
-    "court",
-    "conviction",
-    "allegation",
-    "lawsuit",
-    "enforcement",
-    "criminal",
-    "bribery",
-    "scam",
-    "fine",
-    "penalty",
-]
-
 
 def _snippet_has_adverse_keyword(text: str) -> bool:
     lower = text.lower()
-    return any(kw in lower for kw in ADVERSE_KEYWORDS)
+    return any(kw in lower for kw in get_adverse_keywords())
 
 
 def _extract_domain(url: str) -> str:
@@ -300,7 +284,7 @@ async def collect_data(search_queries: list[str]) -> dict:
 
 def run_stage2(checkpoint: dict) -> dict:
     search_queries = checkpoint.get("search_queries", [])
-    collection = asyncio.run(collect_data(search_queries))
+    collection = run_coroutine_sync(collect_data(search_queries))
 
     return {
         "run_id": checkpoint["run_id"],

@@ -1,3 +1,4 @@
+import html
 import json
 from pathlib import Path
 
@@ -23,6 +24,27 @@ st.set_page_config(
 FRONTEND_DIR = Path(__file__).resolve().parent
 DEFAULT_DATA_PATH = FRONTEND_DIR / "mock_data" / "mock_data.json"
 SETTINGS = get_frontend_settings()
+
+SUBJECT_TYPE_OPTIONS = [
+    "Company",
+    "Private Company",
+    "Individual",
+    "HNW Prospect",
+    "Vendor",
+    "Key Person",
+]
+
+
+def _api_type_to_ui_label(api_type: str) -> str:
+    if (api_type or "").lower() == "individual":
+        return "Individual"
+    return "Company"
+
+
+def _format_disposition(value: str | None) -> str:
+    if not value:
+        return ""
+    return value.replace("_", " ").title()
 
 if "ui_data" not in st.session_state:
     st.session_state.ui_data = load_report_from_path(DEFAULT_DATA_PATH)
@@ -646,10 +668,12 @@ with col1:
     subject_name = st.text_input("Subject Name", subject.get("name", ""))
 
 with col2:
+    default_subject_label = _api_type_to_ui_label(subject.get("type", "organization"))
+    subject_type_index = SUBJECT_TYPE_OPTIONS.index(default_subject_label) if default_subject_label in SUBJECT_TYPE_OPTIONS else 0
     subject_type = st.selectbox(
         "Subject Type",
-        ["Company", "Private Company", "Individual", "HNW Prospect", "Vendor", "Key Person"],
-        index=0
+        SUBJECT_TYPE_OPTIONS,
+        index=subject_type_index,
     )
 
 with col3:
@@ -673,14 +697,24 @@ with col6:
 if run_screening:
     if SETTINGS["use_mock_data"]:
         st.session_state.ui_data = load_report_from_path(DEFAULT_DATA_PATH)
-        st.success("Loaded mock compliance data.")
+        st.session_state.last_success = "Loaded mock compliance data."
         st.rerun()
-    if not subject_name.strip():
+    elif not subject_name.strip():
         st.error("Subject name is required.")
     else:
         try:
             with st.spinner("Running screening pipeline..."):
-                payload = build_screen_request(subject_name, subject_type, country)
+                notes_parts = []
+                if purpose:
+                    notes_parts.append(f"Purpose: {purpose}")
+                if role.strip():
+                    notes_parts.append(f"Role: {role.strip()}")
+                payload = build_screen_request(
+                    subject_name,
+                    subject_type,
+                    country,
+                    input_notes="; ".join(notes_parts) if notes_parts else None,
+                )
                 run_id = start_screening(SETTINGS["backend_url"], payload)
                 result = poll_until_complete(
                     SETTINGS["backend_url"],
@@ -688,15 +722,22 @@ if run_screening:
                     poll_interval=SETTINGS["poll_interval_seconds"],
                     timeout=SETTINGS["poll_timeout_seconds"],
                 )
-                st.session_state.ui_data = normalize_ui_data(result["report"])
+                report = result.get("report")
+                if not report:
+                    raise RuntimeError("Backend returned complete status without a report payload")
+                st.session_state.ui_data = normalize_ui_data(report)
                 st.session_state.last_run_id = run_id
-            st.success(f"Screening complete ({run_id}).")
+                st.session_state.last_success = f"Screening complete ({run_id})."
             st.rerun()
         except ClarificationRequired as exc:
             st.session_state.clarification = exc.payload
             st.warning(f"Run {exc.run_id} requires analyst clarification. Use POST /screen/{exc.run_id}/clarify.")
         except Exception as exc:
             st.error(f"Screening failed: {exc}")
+
+if st.session_state.get("last_success"):
+    st.success(st.session_state.last_success)
+    st.session_state.last_success = None
 
 # Metrics
 m1, m2, m3, m4, m5 = st.columns(5)
@@ -742,7 +783,7 @@ with m5:
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-label">Disposition</div>
-        <div class="metric-value-purple">{assessment.get("recommended_disposition", risk.get("recommendation", "")).replace("_", " ").title()}</div>
+        <div class="metric-value-purple">{_format_disposition(assessment.get("recommended_disposition") or risk.get("recommendation"))}</div>
         <div class="metric-caption">Human review</div>
     </div>
     """, unsafe_allow_html=True)
@@ -751,7 +792,7 @@ with m5:
 left, right = st.columns([2.55, 0.95])
 
 with left:
-        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
         ["Assessment", "Evidence", "Rubric", "Rules", "Memo", "Audit"]
     )
 
@@ -763,7 +804,7 @@ with left:
 
         with a1:
             st.markdown("#### Recommendation")
-            st.warning(f"**Disposition:** {assessment.get('recommended_disposition', '').replace('_', ' ').title()}")
+            st.warning(f"**Disposition:** {_format_disposition(assessment.get('recommended_disposition'))}")
             st.write(assessment.get("disposition_rationale", ""))
 
         with a2:
@@ -870,7 +911,7 @@ with right:
     <div class="memo-card">
         <div class="memo-title">📄 Memo Preview</div>
         <div class="memo-body">
-            {memo.get("body", "")}
+            {html.escape(memo.get("body", "")).replace(chr(10), "<br>")}
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -898,7 +939,7 @@ with right:
     st.write(f"**Method:** {determination.get('method', 'rule_based_v1')}")
     st.write(f"**Rules:** {len(triggered_rules)}")
     st.write(f"**High Evidence:** {support_summary.get('high_support_evidence_count', 0)}")
-    st.write(f"**Disposition:** {assessment.get('recommended_disposition', '').replace('_', ' ').title()}")
+    st.write(f"**Disposition:** {_format_disposition(assessment.get('recommended_disposition'))}")
     st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("""

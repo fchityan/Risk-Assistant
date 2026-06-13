@@ -34,6 +34,7 @@ def build_screen_request(
     country: str | None = None,
     industry: str | None = None,
     known_associations: list[str] | None = None,
+    input_notes: str | None = None,
 ) -> dict:
     payload: dict[str, Any] = {
         "subject_type": map_subject_type(subject_type_label),
@@ -45,6 +46,8 @@ def build_screen_request(
         payload["industry"] = industry.strip()
     if known_associations:
         payload["known_associations"] = known_associations
+    if input_notes and input_notes.strip():
+        payload["input_notes"] = input_notes.strip()
     return payload
 
 
@@ -61,8 +64,19 @@ def _request(
         headers={"Content-Type": "application/json"} if data else {},
         method=method,
     )
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
-        return json.loads(resp.read().decode())
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return json.loads(resp.read().decode())
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode(errors="replace")
+        try:
+            parsed = json.loads(detail)
+            message = parsed.get("detail", detail)
+        except json.JSONDecodeError:
+            message = detail or exc.reason
+        raise RuntimeError(f"HTTP {exc.code} from {url}: {message}") from exc
+    except urllib.error.URLError as exc:
+        raise ConnectionError(f"Could not reach {url}: {exc.reason}") from exc
 
 
 def start_screening(backend_url: str, payload: dict) -> str:

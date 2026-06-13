@@ -48,6 +48,13 @@ def generate_run_id() -> str:
     return f"RSR-{ts}-{seq:03d}"
 
 
+def _atomic_write_json(path: Path, payload: dict) -> None:
+    tmp_path = path.with_suffix(path.suffix + ".tmp")
+    with open(tmp_path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2)
+    tmp_path.replace(path)
+
+
 def save_run_status(
     run_id: str,
     status: RunStatusValue,
@@ -68,8 +75,7 @@ def save_run_status(
         payload["clarification"] = clarification
     if entity_resolution is not None:
         payload["entity_resolution"] = entity_resolution
-    with open(run_dir / "status.json", "w", encoding="utf-8") as f:
-        json.dump(payload, f, indent=2)
+    _atomic_write_json(run_dir / "status.json", payload)
     if status == "error":
         logger.error("[%s] status=error error=%s", run_id, error)
     else:
@@ -86,8 +92,7 @@ def load_run_status(run_id: str) -> dict | None:
 
 def save_final_report(run_id: str, report: dict) -> None:
     run_dir = get_run_dir(run_id)
-    with open(run_dir / "final_report.json", "w", encoding="utf-8") as f:
-        json.dump(report, f, indent=2)
+    _atomic_write_json(run_dir / "final_report.json", report)
     logger.info("[%s] final_report.json written", run_id)
 
 
@@ -118,8 +123,7 @@ def run_or_load(stage_name: str, run_id: str, fn) -> dict:
         raise
 
     elapsed = time.perf_counter() - start
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(result, f, indent=2)
+    _atomic_write_json(path, result)
     logger.info("[%s] stage=%s complete (%.1fs) checkpoint=%s", run_id, stage_name, elapsed, filename)
     return result
 
@@ -222,8 +226,6 @@ def resume_pipeline(run_id: str, clarification: ClarificationRequest | dict) -> 
             prior_candidates = old_cp1b.get("candidate_entities", [])
             prior_resolved = old_cp1b.get("resolved_subject", {})
             prior_inferred = prior_resolved.get("inferred", {})
-            cp1b_path.unlink()
-            logger.info("[%s] cleared stale entity_resolution checkpoint for re-run", run_id)
 
         clar = (
             clarification
@@ -237,9 +239,7 @@ def resume_pipeline(run_id: str, clarification: ClarificationRequest | dict) -> 
             "prior_inferred": prior_inferred,
         }
         cp1b = run_stage1b(cp1_augmented, clar)
-
-        with open(cp1b_path, "w", encoding="utf-8") as f:
-            json.dump(cp1b, f, indent=2)
+        _atomic_write_json(cp1b_path, cp1b)
 
         _run_stages_2_to_5(run_id, cp1b)
         logger.info("[%s] pipeline complete after clarification", run_id)

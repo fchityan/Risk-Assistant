@@ -181,6 +181,8 @@ def normalize_ui_data(raw: dict) -> dict:
 
 
 def load_report_from_path(path: Path) -> dict:
+    if not path.is_file():
+        raise FileNotFoundError(f"Report file not found: {path}")
     with path.open(encoding="utf-8") as f:
         raw = json.load(f)
     return normalize_ui_data(raw)

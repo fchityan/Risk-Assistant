@@ -415,8 +415,20 @@ def assemble_report(checkpoint4: dict) -> ReputationScreeningReport:
     total_sources = checkpoint4.get("total_sources_reviewed", 0)
     items_discarded = checkpoint4.get("items_discarded", 0)
     flagged = sum(1 for e in evidence if e.is_adverse)
+    non_adverse_retained = sum(1 for e in evidence if not e.is_adverse)
 
     coverage = _coverage_assessment(total_sources, len(evidence))
+    coverage_notes = (
+        "Open-web coverage is sufficient for initial review but specialist "
+        "subscription databases were not searched."
+        if coverage != CoverageAssessment.limited
+        else "Limited open-web coverage; no or few adverse items retained."
+    )
+    if non_adverse_retained:
+        coverage_notes += (
+            f" {non_adverse_retained} retained item(s) were not flagged as adverse "
+            "and do not appear in risk_flags."
+        )
     overall_summary = _build_overall_summary(
         case_result["overall_risk_level"],
         case_result["recommended_disposition"],
@@ -428,12 +440,7 @@ def assemble_report(checkpoint4: dict) -> ReputationScreeningReport:
         overall_risk_level=OverallRiskLevel(case_result["overall_risk_level"]),
         overall_summary=overall_summary,
         coverage_assessment=coverage,
-        coverage_notes=(
-            "Open-web coverage is sufficient for initial review but specialist "
-            "subscription databases were not searched."
-            if coverage != CoverageAssessment.limited
-            else "Limited open-web coverage; no or few adverse items retained."
-        ),
+        coverage_notes=coverage_notes,
         recommended_disposition=RecommendedDisposition(case_result["recommended_disposition"]),
         disposition_rationale=_build_disposition_rationale(case_result["recommended_disposition"]),
         determination_basis=DeterminationBasis(

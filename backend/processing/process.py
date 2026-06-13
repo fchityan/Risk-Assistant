@@ -1,5 +1,6 @@
 """Sandbox text processing script — runs inside Daytona or locally."""
 
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -118,6 +119,11 @@ def truncate_tokens(text: str, max_tokens: int = 500) -> str:
     return " ".join(words[:max_tokens])
 
 
+def make_evidence_id(url: str) -> str:
+    digest = hashlib.md5(url.encode(), usedforsecurity=False).hexdigest()[:8].upper()
+    return f"EV-{digest}"
+
+
 def process_items(raw_items: list[dict], subject: dict) -> dict:
     config = load_config()
     adverse_keywords = config.get("adverse_keywords", [])
@@ -131,7 +137,7 @@ def process_items(raw_items: list[dict], subject: dict) -> dict:
     discarded = 0
     flagged_adverse = 0
 
-    for idx, item in enumerate(raw_items):
+    for item in raw_items:
         url = item.get("url", "")
         title = item.get("title", "")
         snippet = item.get("snippet", "")
@@ -161,7 +167,7 @@ def process_items(raw_items: list[dict], subject: dict) -> dict:
 
         processed.append(
             {
-                "evidence_id": f"EV-{idx + 1:03d}",
+                "evidence_id": make_evidence_id(url) if url else f"EV-{len(processed) + 1:03d}",
                 "source_type": source_type,
                 "source_name": domain or "unknown",
                 "title": title or "Untitled",

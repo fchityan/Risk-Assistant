@@ -68,11 +68,19 @@ case_linkage:
 """
 
 
-def _conservative_classification(evidence_id: str) -> EvidenceClassification:
+def _conservative_classification(
+    evidence_id: str,
+    source_tier_hint: str | None = None,
+) -> EvidenceClassification:
+    tier = SourceTier.tier_3
+    if source_tier_hint == "tier_1":
+        tier = SourceTier.tier_1
+    elif source_tier_hint == "tier_2":
+        tier = SourceTier.tier_2
     return EvidenceClassification(
         evidence_id=evidence_id,
         entity_match=EntityMatch.low,
-        source_tier=SourceTier.tier_3,
+        source_tier=tier,
         adverse_severity=AdverseSeverity.low,
         recency=Recency.stale,
         jurisdiction_relevance=EntityMatch.low,
@@ -81,6 +89,29 @@ def _conservative_classification(evidence_id: str) -> EvidenceClassification:
         justification="Classification defaulted to lowest bands due to validation or API failure.",
         risk_categories=[RiskCategory.other],
     )
+
+
+def _apply_source_tier_hint(
+    item: dict,
+    classification: EvidenceClassification,
+) -> EvidenceClassification:
+    """Do not let the LLM downgrade a deterministic domain tier hint."""
+    hint = item.get("source_tier_hint")
+    if not hint:
+        return classification
+
+    hint_tier = {
+        "tier_1": SourceTier.tier_1,
+        "tier_2": SourceTier.tier_2,
+        "tier_3": SourceTier.tier_3,
+    }.get(hint)
+    if hint_tier is None:
+        return classification
+
+    tier_rank = {SourceTier.tier_3: 0, SourceTier.tier_2: 1, SourceTier.tier_1: 2}
+    if tier_rank.get(hint_tier, 0) > tier_rank.get(classification.source_tier, 0):
+        classification.source_tier = hint_tier
+    return classification
 
 
 def _build_user_prompt(processed_items: list[dict], subject: dict, error_hint: str | None = None) -> str:
@@ -98,6 +129,9 @@ Rubric definitions:
 
 Evidence items to classify:
 {items_json}
+
+Each item may include source_tier_hint from deterministic domain classification.
+Prefer source_tier_hint when the excerpt does not clearly contradict it (e.g. reuters.com -> tier_1).
 {error_block}
 Return a JSON object with an "items" array. Each element must contain:
 - evidence_id (from input)
@@ -161,7 +195,10 @@ def _classify_batch(
         validated, error_hint = _validate_classifications(parsed_items)
 
         if error_hint is None and len(validated) == len(processed_items):
-            return validated
+            return [
+                _apply_source_tier_hint(item, cls)
+                for item, cls in zip(processed_items, validated)
+            ]
 
         logger.warning("LLM classification validation attempt %d: %s", attempt + 1, error_hint)
         if attempt == 1:
@@ -171,7 +208,11 @@ def _classify_batch(
     result: list[EvidenceClassification] = []
     for item in processed_items:
         eid = item["evidence_id"]
-        result.append(by_id.get(eid, _conservative_classification(eid)))
+        classification = by_id.get(
+            eid,
+            _conservative_classification(eid, item.get("source_tier_hint")),
+        )
+        result.append(_apply_source_tier_hint(item, classification))
     return result
 
 
@@ -185,7 +226,7 @@ def classify_evidence_items(
     if not llm_configured():
         logger.warning("LLM not configured; using conservative classifications for %d items", len(processed_items))
         return [
-            _conservative_classification(item["evidence_id"])
+            _conservative_classification(item["evidence_id"], item.get("source_tier_hint"))
             for item in processed_items
         ]
 

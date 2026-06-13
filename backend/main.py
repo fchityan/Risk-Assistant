@@ -1,5 +1,6 @@
 """FastAPI application for reputation screening."""
 
+import asyncio
 import logging
 import time
 from contextlib import asynccontextmanager
@@ -47,7 +48,12 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:8501",
+        "http://127.0.0.1:8501",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -131,13 +137,13 @@ async def create_screening(req: ScreenRequest, background_tasks: BackgroundTasks
 
 @app.get("/screen/{run_id}")
 async def get_screening(run_id: str):
-    status = load_run_status(run_id)
+    status = await asyncio.to_thread(load_run_status, run_id)
     if status is None:
         logger.warning("GET /screen/%s not found", run_id)
         raise HTTPException(status_code=404, detail="Run not found")
 
     if status["status"] == "complete":
-        report = load_final_report(run_id)
+        report = await asyncio.to_thread(load_final_report, run_id)
         if report is None:
             logger.error("[%s] complete status but final_report.json missing", run_id)
             raise HTTPException(status_code=500, detail="Report missing for completed run")
@@ -171,7 +177,7 @@ async def clarify_screening(
     clarification: ClarificationRequest,
     background_tasks: BackgroundTasks,
 ):
-    status = load_run_status(run_id)
+    status = await asyncio.to_thread(load_run_status, run_id)
     if status is None:
         logger.warning("POST /screen/%s/clarify run not found", run_id)
         raise HTTPException(status_code=404, detail="Run not found")

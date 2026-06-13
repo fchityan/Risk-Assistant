@@ -3,6 +3,7 @@
 import json
 from datetime import datetime, timezone
 
+from async_utils import run_coroutine_sync
 from config import get_settings
 from logging_config import get_logger
 from schemas.resolution import (
@@ -383,6 +384,4 @@ def run_stage1b(
     checkpoint1: dict,
     clarification: ClarificationRequest | None = None,
 ) -> dict:
-    import asyncio
-
-    return asyncio.run(run_stage1b_async(checkpoint1, clarification))
+    return run_coroutine_sync(run_stage1b_async(checkpoint1, clarification))
