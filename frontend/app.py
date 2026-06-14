@@ -9,7 +9,12 @@ from api_client import build_screen_request, get_screen_status, start_screening,
 from report_adapter import load_report_from_path, normalize_ui_data
 from settings import get_frontend_settings
 
-st.set_page_config(page_title="Risk Assistant", page_icon="🛡️", layout="wide")
+st.set_page_config(
+    page_title="Risk Assistant",
+    page_icon="🛡️",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 FRONTEND_DIR = Path(__file__).resolve().parent
 DEFAULT_DATA_PATH = FRONTEND_DIR / "mock_data" / "mock_data.json"
@@ -142,7 +147,10 @@ st.markdown(
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
 .stApp { font-family: 'Manrope', sans-serif; background: linear-gradient(180deg, #f6f9ff 0%, #edf3ff 100%); }
-header[data-testid="stHeader"] { display: none !important; }
+header[data-testid="stHeader"] { display: block !important; background: transparent !important; }
+button[kind="headerNoPadding"] { display: none !important; }
+[data-testid="collapsedControl"] { display: none !important; visibility: hidden !important; }
+[data-testid="stSidebarCollapseButton"] { display: none !important; }
 div[data-testid="stAppViewContainer"] { background: linear-gradient(180deg, #f7f9fd 0%, #f0f4fb 100%); }
 h1,h2,h3,h4,h5 { font-family: 'Space Grotesk', sans-serif !important; }
 section[data-testid="stSidebar"] { background: linear-gradient(190deg, #061a3a 0%, #0a2d5d 58%, #07214a 100%) !important; border-right: 1px solid rgba(180,210,255,0.25); }
@@ -210,9 +218,9 @@ section[data-testid="stSidebar"] .block-container { padding: 16px 14px 16px 14px
 .kv-value { font-size:13px; color:#314c7d; }
 .assessment-divider { border-top:1px solid #dce5f5; margin:14px 0 11px 0; }
 .scope-grid { display:grid; grid-template-columns: 1fr 1fr; gap:18px; }
-.sb-brand-row { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
-.sb-logo { width:48px; height:48px; border-radius:12px; background:linear-gradient(160deg,#1f70cf,#1ab6a7); display:flex; align-items:center; justify-content:center; font-size:20px; }
-.sb-title { font-size:38px; font-weight:800; line-height:1.04; color:#ffffff; white-space: nowrap; }
+.sb-brand-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.sb-logo { width:40px; height:40px; flex-shrink:0; border-radius:10px; background:linear-gradient(160deg,#1f70cf,#1ab6a7); display:flex; align-items:center; justify-content:center; font-size:18px; }
+.sb-title { font-size:22px; font-weight:800; line-height:1.1; color:#ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sb-subtitle { font-size:13px; color:#bfd4f5 !important; margin-top:4px; }
 .sb-nav-item { padding:11px 12px; border-radius:12px; font-size:14px; font-weight:600; margin-bottom:8px; }
 .sb-nav-item-active { background:linear-gradient(90deg,rgba(37,99,235,0.9),rgba(16,153,141,0.85)); }
@@ -226,7 +234,8 @@ section[data-testid="stSidebar"] .block-container { padding: 16px 14px 16px 14px
     section[data-testid="stSidebar"] { width: 272px !important; min-width: 272px !important; }
 }
 @media (max-width: 1023px) {
-    .sb-title { font-size:30px; }
+    .sb-title { font-size:20px; }
+    section[data-testid="stSidebar"] { width: min(86vw, 300px) !important; min-width: min(86vw, 300px) !important; }
 }
 </style>
 """,
@@ -247,11 +256,11 @@ st.sidebar.markdown(
     + mock_note
     + """
 <hr style="border:0;border-top:1px solid rgba(200,225,255,0.22);margin:10px 0;">
-<div class="sb-nav-item sb-nav-item-active">⌂ &nbsp;Dashboard</div>
-<div class="sb-nav-item">◌ &nbsp;Screenings</div>
-<div class="sb-nav-item">✣ &nbsp;Rules</div>
-<div class="sb-nav-item">☰ &nbsp;Reports</div>
-<div class="sb-nav-item">■ &nbsp;Audit</div>
+<div class="sb-nav-item sb-nav-item-active">🏠 &nbsp;Dashboard</div>
+<div class="sb-nav-item">🔍 &nbsp;Screenings</div>
+<div class="sb-nav-item">⚙️ &nbsp;Rules</div>
+<div class="sb-nav-item">📋 &nbsp;Reports</div>
+<div class="sb-nav-item">📁 &nbsp;Audit</div>
 
 <div class="sb-system-label">System</div>
 <div class="sb-system-card">
@@ -263,6 +272,7 @@ st.sidebar.markdown(
 Evidence -> Rules -> Memo
 </div>
 
+<div style="height: 22px;"></div>
 <div class="sb-profile">
     <div class="sb-profile-avatar">RA</div>
     <div>
