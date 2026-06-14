@@ -1174,3 +1174,96 @@ NameError: name 'logger' is not defined
 2026-06-14 18:16:51,443 INFO [main] API shutdown
 2026-06-14 18:16:53,523 INFO [main] API starting agent_version=0.1.0-hackathon log_level=INFO llm_provider=kimi
 2026-06-14 18:16:57,973 INFO [main] GET / -> 404 (0ms)
+2026-06-14 18:18:57,807 INFO [main] GET /health -> 200 (1ms)
+2026-06-14 18:19:17,471 INFO [main] GET /screen/RSR-20260614-007 -> 200 (1ms)
+2026-06-14 18:20:08,697 INFO [orchestrator] [RSR-20260614-008] status=queued stage=None
+2026-06-14 18:20:08,703 INFO [main] [RSR-20260614-008] screening queued subject_type=organization primary_name=Singapore Airlines
+2026-06-14 18:20:08,705 INFO [main] POST /screen -> 200 (20ms)
+2026-06-14 18:20:08,712 INFO [orchestrator] [RSR-20260614-008] pipeline started
+2026-06-14 18:20:08,718 INFO [orchestrator] [RSR-20260614-008] status=running stage=subject_prep
+2026-06-14 18:20:08,720 INFO [orchestrator] [RSR-20260614-008] stage=subject_prep running
+2026-06-14 18:20:08,722 INFO [orchestrator] [RSR-20260614-008] stage=subject_prep complete (0.0s) checkpoint=checkpoint_subject_prep.json
+2026-06-14 18:20:08,726 INFO [orchestrator] [RSR-20260614-008] status=running stage=entity_resolution
+2026-06-14 18:20:08,726 INFO [orchestrator] [RSR-20260614-008] stage=entity_resolution running
+2026-06-14 18:20:08,730 INFO [stages.stage1b_resolve] [RSR-20260614-008] entity_resolution ambiguity=low action=continue candidates=0 clarified=False
+2026-06-14 18:20:08,733 INFO [orchestrator] [RSR-20260614-008] stage=entity_resolution complete (0.0s) checkpoint=checkpoint_entity_resolution.json
+2026-06-14 18:20:08,733 INFO [orchestrator] [RSR-20260614-008] status=running stage=data_collection
+2026-06-14 18:20:08,734 INFO [orchestrator] [RSR-20260614-008] stage=data_collection running
+2026-06-14 18:20:08,738 INFO [stages.stage2_collect] SERP collection starting queries=6 browser=False
+2026-06-14 18:20:11,981 INFO [stages.stage2_collect] SERP collection done items=56 mode=live_serp_only browser_fetches=0
+2026-06-14 18:20:11,982 INFO [orchestrator] [RSR-20260614-008] stage=data_collection complete (3.2s) checkpoint=checkpoint_data_collection.json
+2026-06-14 18:20:11,983 INFO [orchestrator] [RSR-20260614-008] status=running stage=sandbox_processing
+2026-06-14 18:20:11,983 INFO [orchestrator] [RSR-20260614-008] stage=sandbox_processing running
+2026-06-14 18:20:11,988 INFO [orchestrator] [RSR-20260614-008] stage=sandbox_processing complete (0.0s) checkpoint=checkpoint_sandbox_processing.json
+2026-06-14 18:20:11,990 INFO [orchestrator] [RSR-20260614-008] status=running stage=llm_reasoning
+2026-06-14 18:20:11,991 INFO [orchestrator] [RSR-20260614-008] stage=llm_reasoning running
+2026-06-14 18:20:11,991 INFO [stages.stage4_llm] LLM classifying batch 1-5 of 56 items
+2026-06-14 18:20:13,849 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:20:18,893 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:20:23,945 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:20:27,374 INFO [stages.stage4_llm] LLM classifying batch 6-10 of 56 items
+2026-06-14 18:20:29,002 INFO [main] GET /screen/RSR-20260614-008 -> 200 (3ms)
+2026-06-14 18:20:34,099 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:20:39,145 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:20:40,154 INFO [stages.stage4_llm] LLM classifying batch 11-15 of 56 items
+2026-06-14 18:20:44,189 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:20:49,234 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:20:53,137 INFO [stages.stage4_llm] LLM classifying batch 16-20 of 56 items
+2026-06-14 18:20:54,277 INFO [main] GET /screen/RSR-20260614-008 -> 200 (2ms)
+2026-06-14 18:20:59,322 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:21:04,364 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:21:07,583 INFO [stages.stage4_llm] LLM classifying batch 21-25 of 56 items
+2026-06-14 18:21:09,410 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:21:14,456 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:21:19,500 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:21:21,479 INFO [stages.stage4_llm] LLM classifying batch 26-30 of 56 items
+2026-06-14 18:21:24,546 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:21:29,589 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:21:34,650 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:21:36,403 INFO [stages.stage4_llm] LLM classifying batch 31-35 of 56 items
+2026-06-14 18:21:39,754 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:21:44,802 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:21:49,854 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:21:53,554 INFO [stages.stage4_llm] LLM classifying batch 36-40 of 56 items
+2026-06-14 18:21:54,912 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:21:59,958 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:22:05,011 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:22:08,856 INFO [stages.stage4_llm] LLM classifying batch 41-45 of 56 items
+2026-06-14 18:22:10,058 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:22:15,102 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:22:20,156 INFO [main] GET /screen/RSR-20260614-008 -> 200 (8ms)
+2026-06-14 18:22:20,953 INFO [stages.stage4_llm] LLM classifying batch 46-50 of 56 items
+2026-06-14 18:22:25,202 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:22:30,249 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:22:34,962 INFO [stages.stage4_llm] LLM classifying batch 51-55 of 56 items
+2026-06-14 18:22:35,297 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:22:40,343 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:22:45,388 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:22:47,655 INFO [stages.stage4_llm] LLM classifying batch 56-56 of 56 items
+2026-06-14 18:22:50,435 INFO [main] GET /screen/RSR-20260614-008 -> 200 (1ms)
+2026-06-14 18:22:51,467 INFO [stages.stage4_llm] LLM classified 56 evidence items
+2026-06-14 18:22:51,473 INFO [orchestrator] [RSR-20260614-008] stage=llm_reasoning complete (159.5s) checkpoint=checkpoint_llm_reasoning.json
+2026-06-14 18:22:51,474 INFO [orchestrator] [RSR-20260614-008] status=running stage=rule_engine
+2026-06-14 18:22:51,474 INFO [orchestrator] [RSR-20260614-008] stage=rule_engine running
+2026-06-14 18:22:51,900 ERROR [stages.stage5_rules] SenseNova memo generation failed model=SenseNova-5; using deterministic memo
+Traceback (most recent call last):
+  File "/workspaces/hackathon-dd-agent/backend/stages/stage5_rules.py", line 371, in _maybe_generate_sensenova_memo
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.12/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1147, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/opt/conda/lib/python3.12/site-packages/openai/_base_client.py", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.12/site-packages/openai/_base_client.py", line 1047, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'code': 16, 'message': 'Forbidden'}}
+2026-06-14 18:22:51,907 INFO [orchestrator] [RSR-20260614-008] stage=rule_engine complete (0.4s) checkpoint=checkpoint_rule_engine.json
+2026-06-14 18:22:51,919 INFO [orchestrator] [RSR-20260614-008] final_report.json written
+2026-06-14 18:22:51,924 INFO [orchestrator] [RSR-20260614-008] status=complete stage=rule_engine
+2026-06-14 18:22:51,924 INFO [orchestrator] [RSR-20260614-008] pipeline complete
+2026-06-14 18:22:55,482 INFO [main] GET /screen/RSR-20260614-008 -> 200 (4ms)
