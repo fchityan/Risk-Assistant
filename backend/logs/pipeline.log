@@ -401,3 +401,5 @@ risk_categories.0
 2026-06-13 17:37:45,743 INFO [orchestrator] [DEMO-ORION-001] final_report.json written
 2026-06-13 17:37:45,753 INFO [orchestrator] [DEMO-ORION-001] status=complete stage=rule_engine
 2026-06-13 17:37:45,771 INFO [orchestrator] [DEMO-AMBIG-001] status=clarification_required stage=entity_resolution
+2026-06-14 11:17:02,358 INFO [main] API starting agent_version=0.1.0-hackathon log_level=INFO llm_provider=kimi
+2026-06-14 11:17:14,268 INFO [main] GET /health -> 200 (1ms)

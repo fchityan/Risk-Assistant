@@ -170,6 +170,18 @@ class AuditTrail(BaseModel):
     processing_notes: list[str]
 
 
+class DashboardSummary(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    risk_category: str
+    support_summary_line: str
+    top_triggered_rule: str
+    confidence_label: str
+    recommendation_label: str
+    entity_match_score: int = Field(ge=0, le=100)
+    entity_match_level: str
+
+
 class ReputationScreeningReport(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -182,6 +194,7 @@ class ReputationScreeningReport(BaseModel):
     evidence: list[EvidenceItem]
     analyst_checklist: list[AnalystChecklistItem]
     audit_trail: AuditTrail
+    dashboard_summary: Optional[DashboardSummary] = None
 
 
 # Stage 4 LLM output (classification only, before support_band assignment)

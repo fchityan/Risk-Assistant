@@ -493,6 +493,32 @@
           "items": { "type": "string" }
         }
       }
+    },
+    "dashboard_summary": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "risk_category",
+        "support_summary_line",
+        "top_triggered_rule",
+        "confidence_label",
+        "recommendation_label",
+        "entity_match_score",
+        "entity_match_level"
+      ],
+      "properties": {
+        "risk_category": { "type": "string" },
+        "support_summary_line": { "type": "string" },
+        "top_triggered_rule": { "type": "string" },
+        "confidence_label": { "type": "string" },
+        "recommendation_label": { "type": "string" },
+        "entity_match_score": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "entity_match_level": { "type": "string" }
+      }
     }
   }
 }

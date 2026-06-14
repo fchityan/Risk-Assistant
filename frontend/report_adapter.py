@@ -63,6 +63,7 @@ def v1_report_to_ui(report: dict) -> dict:
     audit = report.get("audit_trail", {})
     flags = report.get("risk_flags", [])
     checklist = report.get("analyst_checklist", [])
+    dashboard_summary = report.get("dashboard_summary") or {}
 
     level = assessment.get("overall_risk_level", "medium")
     determination = assessment.get("determination_basis", {}) or {}
@@ -80,16 +81,20 @@ def v1_report_to_ui(report: dict) -> dict:
     )
 
     risk_summary = {
-        "riskCategory": _risk_category(level),
-        "supportSummaryLine": support_line,
-        "topTriggeredRule": top_rule,
-        "confidenceLabel": coverage_label,
+        "riskCategory": dashboard_summary.get("risk_category") or _risk_category(level),
+        "supportSummaryLine": dashboard_summary.get("support_summary_line") or support_line,
+        "topTriggeredRule": dashboard_summary.get("top_triggered_rule") or top_rule,
+        "confidenceLabel": dashboard_summary.get("confidence_label") or coverage_label,
         "confidenceScore": confidence_score,
-        "recommendation": assessment.get("recommended_disposition", "").replace("_", " ").title(),
+        "recommendation": dashboard_summary.get("recommendation_label")
+        or assessment.get("recommended_disposition", "").replace("_", " ").title(),
         "summary": assessment.get("overall_summary", ""),
     }
 
     entity_match = _entity_match_summary(evidence)
+    if dashboard_summary:
+        entity_match["score"] = dashboard_summary.get("entity_match_score", entity_match["score"])
+        entity_match["level"] = dashboard_summary.get("entity_match_level", entity_match["level"])
 
     evidence_table: list[dict] = []
     for ev in evidence:
@@ -192,6 +197,15 @@ def v1_report_to_ui(report: dict) -> dict:
                 "Escalate to Compliance",
                 "Reject",
             ],
+            "reportMetadata": report.get("report_metadata", {}),
+            "schemaSubject": report.get("subject", {}),
+            "screeningScope": report.get("screening_scope", {}),
+            "rubricDefinition": report.get("rubric_definition", {}),
+            "riskFlags": report.get("risk_flags", []),
+            "evidenceRaw": report.get("evidence", []),
+            "analystChecklistRaw": report.get("analyst_checklist", []),
+            "auditTrailRaw": report.get("audit_trail", {}),
+            "assessmentRaw": report.get("assessment", {}),
         }
     )
     return ui

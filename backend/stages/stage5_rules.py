@@ -11,6 +11,7 @@ from schemas.report import (
     Assessment,
     AuditTrail,
     ComponentScales,
+    DashboardSummary,
     DeterminationBasis,
     EvidenceItem,
     EvidenceClassification,
@@ -550,6 +551,20 @@ def assemble_report(checkpoint4: dict) -> ReputationScreeningReport:
         processing_notes=processing_notes,
     )
 
+    dashboard_summary = DashboardSummary(
+        risk_category=_risk_category_label(case_result["overall_risk_level"]),
+        support_summary_line=(
+            f"{support_summary_dict.get('high_support_evidence_count', 0)} high / "
+            f"{support_summary_dict.get('medium_support_evidence_count', 0)} med / "
+            f"{support_summary_dict.get('low_support_evidence_count', 0)} low"
+        ),
+        top_triggered_rule=(triggered_rules_list[0] if triggered_rules_list else "No rules triggered"),
+        confidence_label=coverage.value.title(),
+        recommendation_label=case_result["recommended_disposition"].replace("_", " ").title(),
+        entity_match_score=_entity_match_score(evidence),
+        entity_match_level=_entity_match_level(evidence),
+    )
+
     report = ReputationScreeningReport(
         report_metadata=ReportMetadata(
             report_id=f"RSR-{run_id}",
@@ -566,6 +581,7 @@ def assemble_report(checkpoint4: dict) -> ReputationScreeningReport:
         evidence=evidence,
         analyst_checklist=analyst_checklist,
         audit_trail=audit_trail,
+        dashboard_summary=dashboard_summary,
     )
 
     return report
@@ -580,3 +596,31 @@ def run_stage5(checkpoint4: dict) -> dict:
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "report": report.model_dump(mode="json"),
     }
+
+
+def _entity_match_score(evidence: list[EvidenceItem]) -> int:
+    score_map = {"high": 90, "medium": 65, "low": 35}
+    best_score = 0
+    for item in evidence:
+        score = score_map.get(item.rubric_assessment.entity_match.value, 35)
+        if score > best_score:
+            best_score = score
+    return best_score
+
+
+def _entity_match_level(evidence: list[EvidenceItem]) -> str:
+    score = _entity_match_score(evidence)
+    if score >= 90:
+        return "High"
+    if score >= 65:
+        return "Medium"
+    return "Low"
+
+
+def _risk_category_label(level: str) -> str:
+    return {
+        "low": "Low Risk",
+        "medium": "Medium Risk",
+        "high": "High Risk",
+        "critical": "Critical Risk",
+    }.get(level, "Medium Risk")
