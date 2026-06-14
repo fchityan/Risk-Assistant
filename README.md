@@ -1,6 +1,6 @@
-# Reputation Screening Agent
+# Risk Assistant
 
-Hackathon project: an automated **public-source reputational screening** pipeline. Submit a person or organization name, the backend searches open web sources, classifies findings with a fixed rubric, and returns a structured **v1 screening report** JSON. A **Streamlit UI** (`frontend/`) calls the API and presents assessment, evidence, rules, and memo views.
+Risk Assistant is an automated **public-source reputational screening** pipeline. Submit a person or organization name, the backend searches open web sources, classifies findings with a fixed rubric, and returns a structured **v1 screening report** JSON. A **Streamlit UI** (`frontend/`) calls the API and presents assessment, evidence, rules, and memo views.
 
 ## What it does
 
