@@ -1428,3 +1428,298 @@ openai.AuthenticationError: Error code: 401 - {'error': {'code': 16, 'message': 
 2026-06-14 18:38:39,627 INFO [orchestrator] [RSR-20260614-010] status=complete stage=rule_engine
 2026-06-14 18:38:39,627 INFO [orchestrator] [RSR-20260614-010] pipeline complete
 2026-06-14 18:38:44,800 INFO [main] GET /screen/RSR-20260614-010 -> 200 (13ms)
+2026-06-16 07:32:07,557 INFO [main] API starting agent_version=0.1.0-hackathon log_level=INFO llm_provider=kimi
+2026-06-16 07:32:11,095 INFO [main] GET /favicon.ico -> 404 (0ms)
+2026-06-16 07:32:13,273 INFO [main] GET / -> 404 (0ms)
+2026-06-16 07:32:31,911 INFO [main] GET /health -> 200 (0ms)
+2026-06-16 07:32:49,933 ERROR [main] [RSR-20260614-003] SenseNova memo generation failed
+Traceback (most recent call last):
+  File "/workspaces/hackathon-dd-agent/backend/main.py", line 234, in generate_sensenova_memo
+    memo = await asyncio.to_thread(generate_sensenova_memo_from_report, report)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/python/3.12.1/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/python/3.12.1/lib/python3.12/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/backend/stages/stage5_rules.py", line 418, in generate_sensenova_memo_from_report
+    return _maybe_generate_sensenova_memo(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/backend/stages/stage5_rules.py", line 376, in _maybe_generate_sensenova_memo
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/.venv/lib/python3.12/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/.venv/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1147, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/.venv/lib/python3.12/site-packages/openai/_base_client.py", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/.venv/lib/python3.12/site-packages/openai/_base_client.py", line 1047, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'code': 16, 'message': 'Forbidden'}}
+2026-06-16 07:32:49,985 INFO [main] POST /screen/RSR-20260614-003/memo/sensenova -> 502 (2097ms)
+2026-06-16 07:35:17,604 WARNING [main] POST /screen/WF-2026-0001/memo/sensenova run not found
+2026-06-16 07:35:17,605 INFO [main] POST /screen/WF-2026-0001/memo/sensenova -> 404 (1ms)
+2026-06-16 07:35:19,888 WARNING [main] POST /screen/WF-2026-0001/memo/sensenova run not found
+2026-06-16 07:35:19,889 INFO [main] POST /screen/WF-2026-0001/memo/sensenova -> 404 (5ms)
+2026-06-16 07:36:38,569 INFO [orchestrator] [RSR-20260616-001] status=queued stage=None
+2026-06-16 07:36:38,570 INFO [main] [RSR-20260616-001] screening queued subject_type=organization primary_name=Singapore Airlines
+2026-06-16 07:36:38,570 INFO [main] POST /screen -> 200 (6ms)
+2026-06-16 07:36:38,571 INFO [orchestrator] [RSR-20260616-001] pipeline started
+2026-06-16 07:36:38,572 INFO [orchestrator] [RSR-20260616-001] status=running stage=subject_prep
+2026-06-16 07:36:38,572 INFO [orchestrator] [RSR-20260616-001] stage=subject_prep running
+2026-06-16 07:36:38,573 INFO [orchestrator] [RSR-20260616-001] stage=subject_prep complete (0.0s) checkpoint=checkpoint_subject_prep.json
+2026-06-16 07:36:38,573 INFO [orchestrator] [RSR-20260616-001] status=running stage=entity_resolution
+2026-06-16 07:36:38,574 INFO [orchestrator] [RSR-20260616-001] stage=entity_resolution running
+2026-06-16 07:36:38,575 INFO [stages.stage1b_resolve] [RSR-20260616-001] entity_resolution ambiguity=low action=continue candidates=0 clarified=False
+2026-06-16 07:36:38,575 INFO [orchestrator] [RSR-20260616-001] stage=entity_resolution complete (0.0s) checkpoint=checkpoint_entity_resolution.json
+2026-06-16 07:36:38,576 INFO [orchestrator] [RSR-20260616-001] status=running stage=data_collection
+2026-06-16 07:36:38,576 INFO [orchestrator] [RSR-20260616-001] stage=data_collection running
+2026-06-16 07:36:38,579 INFO [stages.stage2_collect] SERP collection starting queries=6 browser=False
+2026-06-16 07:36:38,640 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:36:42,708 INFO [stages.stage2_collect] SERP collection done items=55 mode=live_serp_only browser_fetches=0
+2026-06-16 07:36:42,710 INFO [orchestrator] [RSR-20260616-001] stage=data_collection complete (4.1s) checkpoint=checkpoint_data_collection.json
+2026-06-16 07:36:42,712 INFO [orchestrator] [RSR-20260616-001] status=running stage=sandbox_processing
+2026-06-16 07:36:42,713 INFO [orchestrator] [RSR-20260616-001] stage=sandbox_processing running
+2026-06-16 07:36:42,721 INFO [orchestrator] [RSR-20260616-001] stage=sandbox_processing complete (0.0s) checkpoint=checkpoint_sandbox_processing.json
+2026-06-16 07:36:42,721 INFO [orchestrator] [RSR-20260616-001] status=running stage=llm_reasoning
+2026-06-16 07:36:42,722 INFO [orchestrator] [RSR-20260616-001] stage=llm_reasoning running
+2026-06-16 07:36:42,722 INFO [stages.stage4_llm] LLM classifying batch 1-5 of 55 items
+2026-06-16 07:36:43,931 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:36:49,222 INFO [main] GET /screen/RSR-20260616-001 -> 200 (2ms)
+2026-06-16 07:36:54,447 INFO [main] GET /screen/RSR-20260616-001 -> 200 (3ms)
+2026-06-16 07:36:59,760 INFO [main] GET /screen/RSR-20260616-001 -> 200 (2ms)
+2026-06-16 07:37:05,064 INFO [main] GET /screen/RSR-20260616-001 -> 200 (3ms)
+2026-06-16 07:37:10,341 INFO [main] GET /screen/RSR-20260616-001 -> 200 (2ms)
+2026-06-16 07:37:11,197 INFO [stages.stage4_llm] LLM classifying batch 6-10 of 55 items
+2026-06-16 07:37:15,671 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:37:21,101 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:37:25,830 INFO [stages.stage4_llm] LLM classifying batch 11-15 of 55 items
+2026-06-16 07:37:26,435 INFO [main] GET /screen/RSR-20260616-001 -> 200 (2ms)
+2026-06-16 07:37:31,672 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:37:36,929 INFO [main] GET /screen/RSR-20260616-001 -> 200 (3ms)
+2026-06-16 07:37:41,610 INFO [stages.stage4_llm] LLM classifying batch 16-20 of 55 items
+2026-06-16 07:37:42,231 INFO [main] GET /screen/RSR-20260616-001 -> 200 (2ms)
+2026-06-16 07:37:47,457 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:37:52,747 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:37:58,012 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:37:59,255 INFO [stages.stage4_llm] LLM classifying batch 21-25 of 55 items
+2026-06-16 07:38:03,273 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:38:08,596 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:38:13,904 INFO [main] GET /screen/RSR-20260616-001 -> 200 (2ms)
+2026-06-16 07:38:17,794 INFO [stages.stage4_llm] LLM classifying batch 26-30 of 55 items
+2026-06-16 07:38:19,183 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:38:24,465 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:38:29,712 INFO [main] GET /screen/RSR-20260616-001 -> 200 (3ms)
+2026-06-16 07:38:34,721 INFO [stages.stage4_llm] LLM classifying batch 31-35 of 55 items
+2026-06-16 07:38:34,935 INFO [main] GET /screen/RSR-20260616-001 -> 200 (2ms)
+2026-06-16 07:38:40,200 INFO [main] GET /screen/RSR-20260616-001 -> 200 (3ms)
+2026-06-16 07:38:45,455 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:38:50,797 INFO [main] GET /screen/RSR-20260616-001 -> 200 (2ms)
+2026-06-16 07:38:53,694 INFO [stages.stage4_llm] LLM classifying batch 36-40 of 55 items
+2026-06-16 07:38:56,060 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:39:01,375 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:39:06,807 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:39:12,063 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:39:13,038 INFO [stages.stage4_llm] LLM classifying batch 41-45 of 55 items
+2026-06-16 07:39:17,296 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:39:22,601 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:39:27,877 INFO [main] GET /screen/RSR-20260616-001 -> 200 (2ms)
+2026-06-16 07:39:30,734 INFO [stages.stage4_llm] LLM classifying batch 46-50 of 55 items
+2026-06-16 07:39:33,156 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:39:38,407 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:39:43,787 INFO [main] GET /screen/RSR-20260616-001 -> 200 (3ms)
+2026-06-16 07:39:44,534 INFO [stages.stage4_llm] LLM classifying batch 51-55 of 55 items
+2026-06-16 07:39:49,213 INFO [main] GET /screen/RSR-20260616-001 -> 200 (2ms)
+2026-06-16 07:39:54,462 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:39:59,864 INFO [main] GET /screen/RSR-20260616-001 -> 200 (1ms)
+2026-06-16 07:40:04,406 INFO [stages.stage4_llm] LLM classified 55 evidence items
+2026-06-16 07:40:04,409 INFO [orchestrator] [RSR-20260616-001] stage=llm_reasoning complete (201.7s) checkpoint=checkpoint_llm_reasoning.json
+2026-06-16 07:40:04,410 INFO [orchestrator] [RSR-20260616-001] status=running stage=rule_engine
+2026-06-16 07:40:04,410 INFO [orchestrator] [RSR-20260616-001] stage=rule_engine running
+2026-06-16 07:40:05,163 INFO [main] GET /screen/RSR-20260616-001 -> 200 (3ms)
+2026-06-16 07:40:05,195 ERROR [stages.stage5_rules] SenseNova memo generation failed model=SenseNova-5; using deterministic memo
+Traceback (most recent call last):
+  File "/workspaces/hackathon-dd-agent/backend/stages/stage5_rules.py", line 376, in _maybe_generate_sensenova_memo
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/.venv/lib/python3.12/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/.venv/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1147, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/.venv/lib/python3.12/site-packages/openai/_base_client.py", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/.venv/lib/python3.12/site-packages/openai/_base_client.py", line 1047, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'code': 16, 'message': 'Forbidden'}}
+2026-06-16 07:40:05,200 INFO [orchestrator] [RSR-20260616-001] stage=rule_engine complete (0.8s) checkpoint=checkpoint_rule_engine.json
+2026-06-16 07:40:05,203 INFO [orchestrator] [RSR-20260616-001] final_report.json written
+2026-06-16 07:40:05,204 INFO [orchestrator] [RSR-20260616-001] status=complete stage=rule_engine
+2026-06-16 07:40:05,205 INFO [orchestrator] [RSR-20260616-001] pipeline complete
+2026-06-16 07:40:10,594 INFO [main] GET /screen/RSR-20260616-001 -> 200 (6ms)
+2026-06-16 07:40:13,178 ERROR [main] [RSR-20260616-001] SenseNova memo generation failed
+Traceback (most recent call last):
+  File "/workspaces/hackathon-dd-agent/backend/main.py", line 234, in generate_sensenova_memo
+    memo = await asyncio.to_thread(generate_sensenova_memo_from_report, report)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/python/3.12.1/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/python/3.12.1/lib/python3.12/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/backend/stages/stage5_rules.py", line 418, in generate_sensenova_memo_from_report
+    return _maybe_generate_sensenova_memo(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/backend/stages/stage5_rules.py", line 376, in _maybe_generate_sensenova_memo
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/.venv/lib/python3.12/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/.venv/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1147, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/.venv/lib/python3.12/site-packages/openai/_base_client.py", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/.venv/lib/python3.12/site-packages/openai/_base_client.py", line 1047, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'code': 16, 'message': 'Forbidden'}}
+2026-06-16 07:40:13,180 INFO [main] POST /screen/RSR-20260616-001/memo/sensenova -> 502 (296ms)
+2026-06-16 07:40:55,590 INFO [main] GET /health -> 200 (0ms)
+2026-06-16 07:45:19,262 INFO [main] API shutdown
+2026-06-16 07:45:23,576 INFO [main] API starting agent_version=0.1.0-hackathon log_level=INFO llm_provider=kimi
+2026-06-16 07:45:28,938 INFO [main] GET / -> 404 (0ms)
+2026-06-16 07:46:06,052 WARNING [main] [RSR-20260616-001] SenseNova authorization failed: Error code: 401 - {'error': {'code': 16, 'message': 'Forbidden'}}
+2026-06-16 07:46:06,055 INFO [main] POST /screen/RSR-20260616-001/memo/sensenova -> 401 (653ms)
+2026-06-16 07:46:18,769 WARNING [main] [RSR-20260616-001] SenseNova authorization failed: Error code: 401 - {'error': {'code': 16, 'message': 'Forbidden'}}
+2026-06-16 07:46:18,769 INFO [main] POST /screen/RSR-20260616-001/memo/sensenova -> 401 (281ms)
+2026-06-16 07:49:41,507 INFO [main] API shutdown
+2026-06-16 07:49:45,145 INFO [main] API starting agent_version=0.1.0-hackathon log_level=INFO llm_provider=kimi
+2026-06-16 07:49:47,822 INFO [main] GET / -> 404 (0ms)
+2026-06-16 07:52:31,823 INFO [main] GET /health -> 200 (1ms)
+2026-06-16 07:52:42,749 WARNING [main] [RSR-20260616-001] SenseNova authorization failed: Error code: 401 - {'error': {'code': 16, 'message': 'Forbidden'}}
+2026-06-16 07:52:42,749 INFO [main] POST /screen/RSR-20260616-001/memo/sensenova -> 401 (1884ms)
+2026-06-16 07:54:35,241 INFO [main] API shutdown
+2026-06-16 07:54:39,306 INFO [main] API starting agent_version=0.1.0-hackathon log_level=INFO llm_provider=kimi
+2026-06-16 07:54:43,131 INFO [main] GET / -> 404 (0ms)
+2026-06-16 07:55:11,271 WARNING [main] [RSR-20260616-001] SenseNova memo generation failed: Error code: 401 - {'error': {'code': 16, 'message': 'Forbidden'}}; falling back to Kimi
+2026-06-16 07:55:20,195 INFO [stages.stage5_rules] Kimi memo generation succeeded model=moonshot-v1-auto
+2026-06-16 07:55:20,196 INFO [main] POST /screen/RSR-20260616-001/memo/sensenova -> 200 (9591ms)
+2026-06-16 07:55:59,818 INFO [main] GET / -> 404 (0ms)
+2026-06-16 07:57:00,257 INFO [orchestrator] [RSR-20260616-002] status=queued stage=None
+2026-06-16 07:57:00,257 INFO [main] [RSR-20260616-002] screening queued subject_type=organization primary_name=Singapore Airlines
+2026-06-16 07:57:00,257 INFO [main] POST /screen -> 200 (6ms)
+2026-06-16 07:57:00,259 INFO [orchestrator] [RSR-20260616-002] pipeline started
+2026-06-16 07:57:00,259 INFO [orchestrator] [RSR-20260616-002] status=running stage=subject_prep
+2026-06-16 07:57:00,260 INFO [orchestrator] [RSR-20260616-002] stage=subject_prep running
+2026-06-16 07:57:00,260 INFO [orchestrator] [RSR-20260616-002] stage=subject_prep complete (0.0s) checkpoint=checkpoint_subject_prep.json
+2026-06-16 07:57:00,261 INFO [orchestrator] [RSR-20260616-002] status=running stage=entity_resolution
+2026-06-16 07:57:00,261 INFO [orchestrator] [RSR-20260616-002] stage=entity_resolution running
+2026-06-16 07:57:00,262 INFO [stages.stage1b_resolve] [RSR-20260616-002] entity_resolution ambiguity=low action=continue candidates=0 clarified=False
+2026-06-16 07:57:00,263 INFO [orchestrator] [RSR-20260616-002] stage=entity_resolution complete (0.0s) checkpoint=checkpoint_entity_resolution.json
+2026-06-16 07:57:00,264 INFO [orchestrator] [RSR-20260616-002] status=running stage=data_collection
+2026-06-16 07:57:00,265 INFO [orchestrator] [RSR-20260616-002] stage=data_collection running
+2026-06-16 07:57:00,267 INFO [stages.stage2_collect] SERP collection starting queries=6 browser=False
+2026-06-16 07:57:00,317 INFO [main] GET /screen/RSR-20260616-002 -> 200 (3ms)
+2026-06-16 07:57:05,583 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:57:08,018 INFO [stages.stage2_collect] SERP collection done items=54 mode=live_serp_only browser_fetches=0
+2026-06-16 07:57:08,021 INFO [orchestrator] [RSR-20260616-002] stage=data_collection complete (7.8s) checkpoint=checkpoint_data_collection.json
+2026-06-16 07:57:08,022 INFO [orchestrator] [RSR-20260616-002] status=running stage=sandbox_processing
+2026-06-16 07:57:08,023 INFO [orchestrator] [RSR-20260616-002] stage=sandbox_processing running
+2026-06-16 07:57:08,031 INFO [orchestrator] [RSR-20260616-002] stage=sandbox_processing complete (0.0s) checkpoint=checkpoint_sandbox_processing.json
+2026-06-16 07:57:08,032 INFO [orchestrator] [RSR-20260616-002] status=running stage=llm_reasoning
+2026-06-16 07:57:08,033 INFO [orchestrator] [RSR-20260616-002] stage=llm_reasoning running
+2026-06-16 07:57:08,033 INFO [stages.stage4_llm] LLM classifying batch 1-5 of 54 items
+2026-06-16 07:57:10,974 INFO [main] GET /screen/RSR-20260616-002 -> 200 (2ms)
+2026-06-16 07:57:16,333 INFO [main] GET /screen/RSR-20260616-002 -> 200 (5ms)
+2026-06-16 07:57:21,675 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:57:24,753 INFO [stages.stage4_llm] LLM classifying batch 6-10 of 54 items
+2026-06-16 07:57:27,008 INFO [main] GET /screen/RSR-20260616-002 -> 200 (2ms)
+2026-06-16 07:57:32,255 INFO [main] GET /screen/RSR-20260616-002 -> 200 (2ms)
+2026-06-16 07:57:37,582 INFO [main] GET /screen/RSR-20260616-002 -> 200 (4ms)
+2026-06-16 07:57:42,873 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:57:48,263 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:57:49,605 INFO [stages.stage4_llm] LLM classifying batch 11-15 of 54 items
+2026-06-16 07:57:53,592 INFO [main] GET /screen/RSR-20260616-002 -> 200 (3ms)
+2026-06-16 07:57:58,860 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:58:04,262 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:58:08,931 INFO [stages.stage4_llm] LLM classifying batch 16-20 of 54 items
+2026-06-16 07:58:09,579 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:58:14,910 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:58:20,384 INFO [main] GET /screen/RSR-20260616-002 -> 200 (10ms)
+2026-06-16 07:58:25,718 INFO [main] GET /screen/RSR-20260616-002 -> 200 (2ms)
+2026-06-16 07:58:31,109 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:58:32,962 INFO [stages.stage4_llm] LLM classifying batch 21-25 of 54 items
+2026-06-16 07:58:36,462 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:58:41,500 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:58:46,758 INFO [main] GET /screen/RSR-20260616-002 -> 200 (6ms)
+2026-06-16 07:58:52,031 INFO [main] GET /screen/RSR-20260616-002 -> 200 (2ms)
+2026-06-16 07:58:57,336 INFO [main] GET /screen/RSR-20260616-002 -> 200 (2ms)
+2026-06-16 07:59:02,181 INFO [stages.stage4_llm] LLM classifying batch 26-30 of 54 items
+2026-06-16 07:59:02,605 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:59:07,925 INFO [main] GET /screen/RSR-20260616-002 -> 200 (4ms)
+2026-06-16 07:59:13,242 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:59:18,502 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:59:20,870 INFO [stages.stage4_llm] LLM classifying batch 31-35 of 54 items
+2026-06-16 07:59:23,822 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:59:29,080 INFO [main] GET /screen/RSR-20260616-002 -> 200 (2ms)
+2026-06-16 07:59:34,378 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:59:39,679 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:59:42,557 INFO [stages.stage4_llm] LLM classifying batch 36-40 of 54 items
+2026-06-16 07:59:45,003 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:59:50,304 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 07:59:55,577 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 08:00:00,805 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 08:00:06,152 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 08:00:06,539 INFO [stages.stage4_llm] LLM classifying batch 41-45 of 54 items
+2026-06-16 08:00:11,431 INFO [main] GET /screen/RSR-20260616-002 -> 200 (4ms)
+2026-06-16 08:00:16,726 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 08:00:22,070 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 08:00:25,432 INFO [stages.stage4_llm] LLM classifying batch 46-50 of 54 items
+2026-06-16 08:00:27,499 INFO [main] GET /screen/RSR-20260616-002 -> 200 (9ms)
+2026-06-16 08:00:32,838 INFO [main] GET /screen/RSR-20260616-002 -> 200 (2ms)
+2026-06-16 08:00:38,140 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 08:00:43,427 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 08:00:44,957 INFO [stages.stage4_llm] LLM classifying batch 51-54 of 54 items
+2026-06-16 08:00:48,744 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 08:00:54,014 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 08:00:59,313 INFO [main] GET /screen/RSR-20260616-002 -> 200 (2ms)
+2026-06-16 08:01:04,628 INFO [main] GET /screen/RSR-20260616-002 -> 200 (1ms)
+2026-06-16 08:01:05,338 INFO [stages.stage4_llm] LLM classified 54 evidence items
+2026-06-16 08:01:05,341 INFO [orchestrator] [RSR-20260616-002] stage=llm_reasoning complete (237.3s) checkpoint=checkpoint_llm_reasoning.json
+2026-06-16 08:01:05,341 INFO [orchestrator] [RSR-20260616-002] status=running stage=rule_engine
+2026-06-16 08:01:05,342 INFO [orchestrator] [RSR-20260616-002] stage=rule_engine running
+2026-06-16 08:01:05,837 ERROR [stages.stage5_rules] SenseNova memo generation failed model=SenseNova-5; using deterministic memo
+Traceback (most recent call last):
+  File "/workspaces/hackathon-dd-agent/backend/stages/stage5_rules.py", line 376, in _maybe_generate_sensenova_memo
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/.venv/lib/python3.12/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/.venv/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1147, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/.venv/lib/python3.12/site-packages/openai/_base_client.py", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/hackathon-dd-agent/.venv/lib/python3.12/site-packages/openai/_base_client.py", line 1047, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'code': 16, 'message': 'Forbidden'}}
+2026-06-16 08:01:05,846 INFO [orchestrator] [RSR-20260616-002] stage=rule_engine complete (0.5s) checkpoint=checkpoint_rule_engine.json
+2026-06-16 08:01:05,861 INFO [orchestrator] [RSR-20260616-002] final_report.json written
+2026-06-16 08:01:05,864 INFO [orchestrator] [RSR-20260616-002] status=complete stage=rule_engine
+2026-06-16 08:01:05,864 INFO [orchestrator] [RSR-20260616-002] pipeline complete
+2026-06-16 08:01:09,912 INFO [main] GET /screen/RSR-20260616-002 -> 200 (5ms)
+2026-06-16 08:01:17,160 WARNING [main] [RSR-20260616-002] SenseNova memo generation failed: Error code: 401 - {'error': {'code': 16, 'message': 'Forbidden'}}; falling back to Kimi
+2026-06-16 08:01:30,575 INFO [stages.stage5_rules] Kimi memo generation succeeded model=moonshot-v1-auto
+2026-06-16 08:01:30,575 INFO [main] POST /screen/RSR-20260616-002/memo/sensenova -> 200 (14064ms)

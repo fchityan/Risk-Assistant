@@ -346,9 +346,14 @@ def _maybe_generate_sensenova_memo(
     triggered_rules: list[str],
     risk_flags: list[RiskFlag],
     deterministic_memo: str,
+    strict: bool = False,
 ) -> str:
     settings = get_settings()
     if not settings.sensenova_configured:
+        if strict:
+            raise RuntimeError(
+                "SenseNova is not configured. Set SENSENOVA_API_KEY, SENSENOVA_BASE_URL, and SENSENOVA_MODEL."
+            )
         return deterministic_memo
 
     system_prompt, user_prompt = _build_sensenova_memo_prompt(
@@ -383,11 +388,122 @@ def _maybe_generate_sensenova_memo(
         logger.info("SenseNova memo generation succeeded model=%s", settings.sensenova_model)
         return content
     except Exception:
+        if strict:
+            raise
         logger.exception(
             "SenseNova memo generation failed model=%s; using deterministic memo",
             settings.sensenova_model,
         )
         return deterministic_memo
+
+
+def generate_sensenova_memo_from_report(report_dict: dict) -> str:
+    """Generate a memo from an existing final report using SenseNova only (no fallback)."""
+    report = ReputationScreeningReport.model_validate(report_dict)
+    assessment = report.assessment
+    determination = assessment.determination_basis
+    support_summary = determination.support_summary.model_dump(mode="json")
+    triggered_rules = determination.triggered_rules
+
+    deterministic_memo = assessment.memo or _build_memo(
+        report.subject,
+        assessment.overall_summary,
+        assessment.recommended_disposition.value,
+        assessment.disposition_rationale,
+        support_summary,
+        triggered_rules,
+        report.risk_flags,
+    )
+
+    return _maybe_generate_sensenova_memo(
+        report.subject,
+        assessment.overall_summary,
+        assessment.recommended_disposition.value,
+        assessment.disposition_rationale,
+        support_summary,
+        triggered_rules,
+        report.risk_flags,
+        deterministic_memo,
+        strict=True,
+    )
+
+
+def _generate_kimi_memo(
+    subject: Subject,
+    overall_summary: str,
+    disposition: str,
+    disposition_rationale: str,
+    support_summary: dict,
+    triggered_rules: list[str],
+    risk_flags: list[RiskFlag],
+    deterministic_memo: str,
+) -> str:
+    settings = get_settings()
+    if not settings.kimi_api_key or not settings.kimi_base_url or not settings.kimi_model:
+        raise RuntimeError(
+            "Kimi is not configured. Set KIMI_API_KEY, KIMI_BASE_URL, and KIMI_MODEL."
+        )
+
+    system_prompt, user_prompt = _build_sensenova_memo_prompt(
+        subject,
+        overall_summary,
+        disposition,
+        disposition_rationale,
+        support_summary,
+        triggered_rules,
+        risk_flags,
+        deterministic_memo,
+    )
+
+    client = OpenAI(
+        base_url=settings.kimi_base_url,
+        api_key=settings.kimi_api_key,
+    )
+
+    response = client.chat.completions.create(
+        model=settings.kimi_model,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+        temperature=0.2,
+        max_tokens=settings.llm_max_output_tokens,
+    )
+    content = (response.choices[0].message.content or "").strip()
+    if not content:
+        raise RuntimeError("Kimi returned an empty memo")
+    logger.info("Kimi memo generation succeeded model=%s", settings.kimi_model)
+    return content
+
+
+def generate_kimi_memo_from_report(report_dict: dict) -> str:
+    """Generate a memo from an existing final report using Kimi only."""
+    report = ReputationScreeningReport.model_validate(report_dict)
+    assessment = report.assessment
+    determination = assessment.determination_basis
+    support_summary = determination.support_summary.model_dump(mode="json")
+    triggered_rules = determination.triggered_rules
+
+    deterministic_memo = assessment.memo or _build_memo(
+        report.subject,
+        assessment.overall_summary,
+        assessment.recommended_disposition.value,
+        assessment.disposition_rationale,
+        support_summary,
+        triggered_rules,
+        report.risk_flags,
+    )
+
+    return _generate_kimi_memo(
+        report.subject,
+        assessment.overall_summary,
+        assessment.recommended_disposition.value,
+        assessment.disposition_rationale,
+        support_summary,
+        triggered_rules,
+        report.risk_flags,
+        deterministic_memo,
+    )
 
 
 def _build_risk_flags(

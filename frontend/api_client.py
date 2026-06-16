@@ -96,6 +96,14 @@ def submit_clarification(backend_url: str, run_id: str, clarification: dict) -> 
     )
 
 
+def generate_sensenova_memo(backend_url: str, run_id: str) -> dict:
+    return _request(
+        f"{backend_url}/screen/{run_id}/memo/sensenova",
+        method="POST",
+        body={},
+    )
+
+
 def poll_until_complete(
     backend_url: str,
     run_id: str,

@@ -717,7 +717,7 @@ Production multi-stage agent pipelines face a "reliability compounding" problem:
 | Bright Data partial failure | Degrade gracefully | Retain SERP snippet if full fetch fails[10] |
 | Kimi output schema mismatch | Pydantic validation + retry | Validate output; retry once with error in prompt[19] |
 | Kimi API rate limit | Backoff + checkpoint | Checkpoint before LLM call; resume if interrupted[2] |
-| Daytona sandbox error | Recreate and retry | Sandbox creation is < 90ms; safe to retry[11] |
+| Daytona Sandbox error | Recreate and retry | Sandbox creation is < 90ms; safe to retry[11] |
 | Empty evidence set | Graceful completion | Return `low` risk with `coverage: limited` flag; do not error[10] |
 
 A key principle for serial pipelines: run Bright Data queries in parallel (one asyncio task per query), then merge results. This reduces Stage 2 latency significantly without increasing complexity.[10]
@@ -740,7 +740,7 @@ backend/
 │   ├── llm_client.py        # TokenRouter / OpenRouter / Kimi client
 │   └── browser_fetch.py     # Playwright page fetch for Browser API
 ├── processing/
-│   └── process.py           # Script uploaded to Daytona sandbox
+│   └── process.py           # Script uploaded to Daytona Sandbox
 ├── schemas/
 │   ├── rubric.py            # Pydantic enums and rubric types
 │   ├── report.py            # Full report Pydantic model

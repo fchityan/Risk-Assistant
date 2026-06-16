@@ -22,6 +22,7 @@ from orchestrator import (
 from schemas.report import ScreenRequest
 from schemas.resolution import ClarificationRequest
 from stages.llm_client import llm_configured
+from stages.stage5_rules import generate_kimi_memo_from_report, generate_sensenova_memo_from_report
 
 configure_logging()
 logger = get_logger(__name__)
@@ -112,6 +113,9 @@ async def health():
             "openrouter": _is_key_present(settings.openrouter_api_key),
             "openrouter_model": settings.openrouter_model,
             "kimi": _is_key_present(settings.kimi_api_key),
+            "sensenova": _is_key_present(settings.sensenova_api_key),
+            "sensenova_model": settings.sensenova_model,
+            "sensenova_configured": settings.sensenova_configured,
             "daytona": _is_key_present(settings.daytona_api_key),
         },
         "bright_data_note": (
@@ -209,3 +213,77 @@ async def clarify_screening(
         "status": "running",
         "stage": "entity_resolution",
     }
+
+
+@app.post("/screen/{run_id}/memo/sensenova")
+async def generate_sensenova_memo(run_id: str):
+    status = await asyncio.to_thread(load_run_status, run_id)
+    if status is None:
+        logger.warning("POST /screen/%s/memo/sensenova run not found", run_id)
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    if status.get("status") != "complete":
+        raise HTTPException(
+            status_code=409,
+            detail=f"Run is not complete (current status: {status.get('status')})",
+        )
+
+    report = await asyncio.to_thread(load_final_report, run_id)
+    if report is None:
+        logger.error("[%s] memo generation requested but final_report.json missing", run_id)
+        raise HTTPException(status_code=500, detail="Report missing for completed run")
+
+    try:
+        memo = await asyncio.to_thread(generate_sensenova_memo_from_report, report)
+        return {
+            "run_id": run_id,
+            "source": "sensenova",
+            "memo": memo,
+        }
+    except RuntimeError as exc:
+        logger.warning("[%s] SenseNova memo generation rejected: %s; falling back to Kimi", run_id, exc)
+        try:
+            memo = await asyncio.to_thread(generate_kimi_memo_from_report, report)
+            return {
+                "run_id": run_id,
+                "source": "kimi",
+                "memo": memo,
+                "fallback_reason": str(exc),
+            }
+        except Exception as kimi_exc:
+            logger.exception("[%s] Kimi fallback memo generation failed", run_id)
+            raise HTTPException(
+                status_code=502,
+                detail=(
+                    "SenseNova failed and Kimi fallback failed. "
+                    f"SenseNova error: {exc}; Kimi error: {kimi_exc}"
+                ),
+            ) from kimi_exc
+    except Exception as exc:
+        msg = str(exc)
+        logger.warning("[%s] SenseNova memo generation failed: %s; falling back to Kimi", run_id, msg)
+        try:
+            memo = await asyncio.to_thread(generate_kimi_memo_from_report, report)
+            return {
+                "run_id": run_id,
+                "source": "kimi",
+                "memo": memo,
+                "fallback_reason": msg,
+            }
+        except Exception as kimi_exc:
+            logger.exception("[%s] Kimi fallback memo generation failed", run_id)
+            if "Error code: 401" in msg or "Forbidden" in msg:
+                raise HTTPException(
+                    status_code=401,
+                    detail=(
+                        "SenseNova authorization failed (401 Forbidden), and Kimi fallback failed. "
+                        f"Kimi error: {kimi_exc}"
+                    ),
+                ) from kimi_exc
+            raise HTTPException(
+                status_code=502,
+                detail=(
+                    "SenseNova request failed and Kimi fallback failed. "
+                    f"SenseNova error: {exc}; Kimi error: {kimi_exc}"
+                ),
+            ) from kimi_exc

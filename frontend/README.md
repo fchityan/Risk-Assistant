@@ -52,6 +52,13 @@ The frontend reads the shared backend env file, so there is only one runtime con
 3. On `complete`, map `report` via `report_adapter.py` and refresh the dashboard
 4. On `clarification_required`, show a warning; resume with `POST /screen/{run_id}/clarify` (API or future UI)
 
+### Full memo generation flow
+
+1. UI requests `POST {BACKEND_URL}/screen/{run_id}/memo/sensenova` when **View Full Memo** is clicked.
+2. Backend tries SenseNova first.
+3. If SenseNova fails (for example `401 Forbidden`), backend automatically falls back to Kimi.
+4. UI displays the returned memo and the reported source (`sensenova` or `kimi`).
+
 Subject type mapping (UI label → API):
 
 | UI select | API `subject_type` |
@@ -69,14 +76,15 @@ Subject type mapping (UI label → API):
 | `settings.py` | Env configuration |
 | `mock_data/mock_data.json` | Sample v1 report for offline demo |
 
-## Legacy prototype
+## Notes on services folder
 
-`legacy/run_agent.py` and `services/` contain an early standalone agent (mock Bright Data + OpenAI). The production path is **backend pipeline + this UI**. See `legacy/README.md`.
+`services/` contains helper service stubs from early iterations. The production path is **backend pipeline + this UI**.
 
 ## Troubleshooting
 
 - **Connection refused** — ensure backend is running on `BACKEND_URL`
-- **401 on screening** — check `backend/.env` LLM keys (`TOKENROUTER_BASE_URL`, `MiniMax-M3`)
+- **401 on memo generation** — verify `SENSENOVA_API_KEY`; backend will fall back to Kimi if SenseNova is unauthorized
+- **LLM classification/provider issues** — verify Kimi settings in `backend/.env` (`KIMI_API_KEY`, `KIMI_BASE_URL`, `KIMI_MODEL`)
 - **Empty dashboard** — confirm `mock_data/mock_data.json` exists or run completed successfully
 
 Full stack guide: [docs/integration.md](../docs/integration.md) · Architecture: [docs/architecture.md](../docs/architecture.md)

@@ -13,6 +13,7 @@ flowchart LR
 
   UI -->|POST /screen| API
   UI -->|GET /screen/run_id| API
+  UI -->|POST /screen/run_id/memo/sensenova| API
   API --> ORCH
   ORCH --> RUNS
   API -->|report JSON| UI
@@ -92,6 +93,18 @@ Content-Type: application/json
   "candidate_id": "cand_01"
 }
 ```
+
+### Full memo generation
+
+```http
+POST /screen/{run_id}/memo/sensenova
+```
+
+Behavior:
+
+- Backend attempts SenseNova memo generation first.
+- If SenseNova fails (for example `401 Forbidden`), backend automatically falls back to Kimi.
+- Response includes memo body and source (`sensenova` or `kimi`).
 
 ## Report shape
 

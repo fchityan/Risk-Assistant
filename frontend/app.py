@@ -5,7 +5,13 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from api_client import build_screen_request, get_screen_status, start_screening, submit_clarification
+from api_client import (
+    build_screen_request,
+    generate_sensenova_memo,
+    get_screen_status,
+    start_screening,
+    submit_clarification,
+)
 from report_adapter import load_report_from_path, normalize_ui_data
 from settings import get_frontend_settings
 
@@ -88,6 +94,10 @@ def _init_state() -> None:
         st.session_state.clarification_pending = None
     if "last_success" not in st.session_state:
         st.session_state.last_success = None
+    if "show_full_memo" not in st.session_state:
+        st.session_state.show_full_memo = False
+    if "memo_source" not in st.session_state:
+        st.session_state.memo_source = "report"
 
 
 def _poll_if_needed() -> None:
@@ -1000,6 +1010,8 @@ with right:
     disposition_rationale = assessment.get("disposition_rationale", determination.get("rationale", ""))
     memo_body = memo.get("body", "")
     memo_snippet = html.escape(memo_body[:300]).replace("\n", "<br>") if memo_body else ""
+    workflow_run_id = st.session_state.active_run_id or report_metadata.get("workflow_run_id")
+    has_real_backend_run = bool(workflow_run_id) and not str(workflow_run_id).startswith("WF-")
 
     st.markdown(
         f"""
@@ -1011,14 +1023,56 @@ with right:
   <div style='font-size:13px;margin-bottom:8px;'><b>Subject:</b> {html.escape(subject_name_display)}</div>
   <div style='font-size:13px;color:#444;line-height:1.55;margin-bottom:10px;'>{memo_snippet}</div>
   <div style='font-size:13px;margin-bottom:14px;'><b>Disposition:</b> <span style='color:#0f9d8d;font-weight:700;'>{html.escape(disposition_display)}</span><br><span style='font-size:12px;color:#5f7798;'>{html.escape(disposition_rationale[:120]) if disposition_rationale else ''}</span></div>
-  <div style='border:1px solid #d4e0f6;border-radius:9px;padding:9px 14px;font-size:13px;color:#2a5ac8;background:#f8fbff;display:flex;align-items:center;justify-content:space-between;cursor:pointer;'>
-    <span style='font-weight:600;'>View Full Memo</span>
-    <span style='font-size:16px;'>&#x2197;</span>
-  </div>
 </div>
 """,
         unsafe_allow_html=True,
     )
+
+    view_full_memo = st.button("View Full Memo", use_container_width=True)
+    if view_full_memo:
+        if SETTINGS["use_mock_data"]:
+            st.session_state.show_full_memo = True
+            st.session_state.memo_source = "mock"
+        elif not has_real_backend_run:
+            st.error("No completed backend run is loaded. Click Run Screening first, wait for completion, then try View Full Memo.")
+        else:
+            try:
+                result = generate_sensenova_memo(SETTINGS["backend_url"], workflow_run_id)
+                generated_memo = result.get("memo", "").strip()
+                if not generated_memo:
+                    raise RuntimeError("SenseNova returned an empty memo")
+                st.session_state.ui_data["memo"]["body"] = generated_memo
+                if "assessmentRaw" in st.session_state.ui_data:
+                    st.session_state.ui_data["assessmentRaw"]["memo"] = generated_memo
+                st.session_state.memo_source = result.get("source", "sensenova")
+                st.session_state.show_full_memo = True
+                st.rerun()
+            except Exception as exc:
+                if "Run not found" in str(exc):
+                    st.error(
+                        f"Run {workflow_run_id} was not found in backend. Run screening again to create a fresh backend run, then retry View Full Memo."
+                    )
+                    st.stop()
+                if "HTTP 401" in str(exc) or "Forbidden" in str(exc):
+                    st.error(
+                        "SenseNova authorization failed (401 Forbidden). "
+                        "Please update SENSENOVA_API_KEY in backend/.env with a key that has compatible-mode model access."
+                    )
+                    st.stop()
+                st.error(f"Could not generate SenseNova memo: {exc}")
+
+    if st.session_state.show_full_memo:
+        with st.container(border=True):
+            st.markdown("**Full Memo**")
+            st.caption(f"Source: {st.session_state.memo_source}")
+            st.markdown(
+                memo_body
+                if memo_body
+                else "No memo body is available yet. Run screening to generate the final memo.")
+            close_full_memo = st.button("Close Full Memo", use_container_width=True)
+            if close_full_memo:
+                st.session_state.show_full_memo = False
+                st.rerun()
 
     with st.container(border=True):
         st.markdown(
