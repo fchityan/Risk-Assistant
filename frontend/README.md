@@ -1,6 +1,6 @@
 # Frontend — Risk Assistant (Streamlit)
 
-Evidence-grounded reputational screening UI. By default it calls the **FastAPI backend** (`backend/`) and renders the v1 screening report. Set `USE_MOCK_DATA=true` to load local sample JSON only.
+Evidence-grounded reputational screening UI. By default it tries the **FastAPI backend** (`backend/`) first and renders live results when reachable. If the backend is unreachable, it automatically falls back to local mock data. Set `USE_MOCK_DATA=true` to force mock mode.
 
 ## Quick start
 
@@ -21,16 +21,24 @@ streamlit run app.py --server.port 8501
 
 Open http://localhost:8501
 
-## Configuration (`backend/.env`)
+## Configuration (`.env` preferred)
 
-The frontend reads the shared backend env file, so there is only one runtime config file to edit.
+The frontend reads environment values from the repository root `.env` file first,
+and falls back to `backend/.env` for backward compatibility.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `BACKEND_URL` | `http://127.0.0.1:8000` | FastAPI base URL |
-| `USE_MOCK_DATA` | `false` | Load `mock_data/mock_data.json` instead of API |
+| `USE_MOCK_DATA` | `false` | Force `mock_data/mock_data.json` instead of API |
 | `POLL_INTERVAL_SECONDS` | `5` | Status poll interval |
 | `POLL_TIMEOUT_SECONDS` | `900` | Max wait for pipeline completion |
+
+Runtime data source selection:
+
+1. If `USE_MOCK_DATA=true`: always use mock data.
+2. Else: call `GET {BACKEND_URL}/health`.
+3. If healthy (`status=ok`): use live API.
+4. If unhealthy/unreachable: fallback to `mock_data/mock_data.json`.
 
 ## Backend integration
 

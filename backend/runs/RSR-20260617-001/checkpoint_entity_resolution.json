@@ -1,0 +1,81 @@
+{
+  "run_id": "RSR-20260617-001",
+  "stage": "entity_resolution",
+  "status": "complete",
+  "timestamp": "2026-06-17T11:32:36.893025+00:00",
+  "subject": {
+    "subject_type": "organization",
+    "primary_name": "Singapore Airlines",
+    "aliases": [],
+    "country": "Singapore",
+    "industry": "aviation",
+    "known_associations": [
+      "SIA",
+      "Singapore Airlines Limited"
+    ],
+    "input_notes": null
+  },
+  "screening_scope": {
+    "jurisdictions": [
+      "Singapore"
+    ],
+    "languages": [
+      "en"
+    ],
+    "lookback_period_years": 5,
+    "search_queries": [
+      "\"Singapore Airlines\" \"Singapore\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction",
+      "\"Singapore Airlines\" regulatory enforcement legal action",
+      "\"Singapore Airlines\" sanctions OR watchlist OR OFAC",
+      "\"Singapore Airlines\" \"SIA\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction",
+      "\"Singapore Airlines\" \"Singapore Airlines Limited\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction",
+      "\"Singapore Airlines\" site:reuters.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction",
+      "\"Singapore Airlines\" site:straitstimes.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction",
+      "\"Singapore Airlines\" site:channelnewsasia.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    ],
+    "screening_limitations": [
+      "Open-web public sources only; subscription databases not searched.",
+      "Automated screening; analyst review required for elevated findings."
+    ]
+  },
+  "search_queries": [
+    "\"Singapore Airlines\" \"Singapore\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction",
+    "\"Singapore Airlines\" regulatory enforcement legal action",
+    "\"Singapore Airlines\" sanctions OR watchlist OR OFAC",
+    "\"Singapore Airlines\" \"SIA\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction",
+    "\"Singapore Airlines\" \"Singapore Airlines Limited\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction",
+    "\"Singapore Airlines\" site:reuters.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction",
+    "\"Singapore Airlines\" site:straitstimes.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction",
+    "\"Singapore Airlines\" site:channelnewsasia.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+  ],
+  "resolved_subject": {
+    "user_provided": {
+      "country": "Singapore",
+      "industry": "aviation",
+      "known_associations": [
+        "SIA",
+        "Singapore Airlines Limited"
+      ]
+    },
+    "inferred": {
+      "country": null,
+      "industry": null,
+      "known_associations": []
+    },
+    "confirmed": {
+      "country": null,
+      "industry": null,
+      "known_associations": []
+    }
+  },
+  "entity_resolution": {
+    "ambiguity_level": "low",
+    "reason_codes": [
+      "USER_PROVIDED_IDENTIFIER"
+    ],
+    "action": "continue"
+  },
+  "candidate_entities": [],
+  "clarification_form": null,
+  "clarification_received": false
+}

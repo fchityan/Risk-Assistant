@@ -104,6 +104,10 @@ def generate_sensenova_memo(backend_url: str, run_id: str) -> dict:
     )
 
 
+def get_health(backend_url: str) -> dict:
+    return _request(f"{backend_url}/health", timeout=5.0)
+
+
 def poll_until_complete(
     backend_url: str,
     run_id: str,

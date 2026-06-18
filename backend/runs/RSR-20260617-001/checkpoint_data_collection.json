@@ -1,0 +1,739 @@
+{
+  "run_id": "RSR-20260617-001",
+  "stage": "data_collection",
+  "status": "complete",
+  "timestamp": "2026-06-17T11:32:44.721720+00:00",
+  "subject": {
+    "subject_type": "organization",
+    "primary_name": "Singapore Airlines",
+    "aliases": [],
+    "country": "Singapore",
+    "industry": "aviation",
+    "known_associations": [
+      "SIA",
+      "Singapore Airlines Limited"
+    ],
+    "input_notes": null
+  },
+  "screening_scope": {
+    "jurisdictions": [
+      "Singapore"
+    ],
+    "languages": [
+      "en"
+    ],
+    "lookback_period_years": 5,
+    "search_queries": [
+      "\"Singapore Airlines\" \"Singapore\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction",
+      "\"Singapore Airlines\" regulatory enforcement legal action",
+      "\"Singapore Airlines\" sanctions OR watchlist OR OFAC",
+      "\"Singapore Airlines\" \"SIA\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction",
+      "\"Singapore Airlines\" \"Singapore Airlines Limited\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction",
+      "\"Singapore Airlines\" site:reuters.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction",
+      "\"Singapore Airlines\" site:straitstimes.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction",
+      "\"Singapore Airlines\" site:channelnewsasia.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    ],
+    "screening_limitations": [
+      "Open-web public sources only; subscription databases not searched.",
+      "Automated screening; analyst review required for elevated findings."
+    ]
+  },
+  "raw_items": [
+    {
+      "url": "https://www.singaporeair.com/en_UK/sg/about-us/corporate-policies/",
+      "title": "Corporate Policies",
+      "snippet": "Anti-Bribery / Anti-Corruption Statement. This statement sets out the Singapore Airlines Group's commitment to comply with anti-bribery and anti-corruption laws ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "singaporeair.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"Singapore\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.aerotime.aero/articles/three-passengers-file-uk-lawsuit-against-singapore-airlines-over-sq321-turbulence",
+      "title": "Singapore Airlines faces lawsuit over SQ321 turbulence",
+      "snippet": "6 May 2026 \u2014 Three passengers file UK High Court lawsuit against Singapore Airlines over turbulence that killed one and hospitalized 104 on ...",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "aerotime.aero",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"Singapore\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Singapore_Airlines_Flight_006",
+      "title": "Singapore Airlines Flight 006",
+      "snippet": "Singapore Airlines Flight 006 was an international scheduled passenger flight from Singapore Changi Airport to Los Angeles International AirportRead more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "en.wikipedia.org",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"Singapore\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://violationtracker.goodjobsfirst.org/parent/singapore-airlines",
+      "title": "Singapore Airlines - Violation Tracker - Good Jobs First",
+      "snippet": "Individual Penalty Records: ; Singapore Airlines Limited, price-fixing or anti-competitive practices, 2015, private lawsuit-federal, $92,492,442 ; Singapore ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "violationtracker.goodjobsfirst.org",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"Singapore\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://theindependent.sg/3-passengers-file-lawsuit-in-uk-against-singapore-airlines-over-turbulence-on-sq321/",
+      "title": "3 passengers file lawsuit in UK against Singapore Airlines ...",
+      "snippet": "8 May 2026 \u2014 Singapore Airlines had offered up to $25000 in advance payments, but some passengers are now taking legal action.",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "theindependent.sg",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"Singapore\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://sg.linkedin.com/jobs/view/accounting-finance-fraud-analyst-2-years-contract-at-singapore-airlines-4367813876",
+      "title": "Accounting / Finance - Fraud Analyst (2 Years Contract)",
+      "snippet": "Accounting / Finance - Fraud Analyst (2 Years Contract). Singapore Airlines Singapore, Singapore. 2 months ago Be among the first 25 applicants.Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "sg.linkedin.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"Singapore\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.channelnewsasia.com/singapore/sq321-report-findings-investigation-radar-turbulence-6129846",
+      "title": "Inside SQ321: Key findings from Singapore's final ...",
+      "snippet": "19 May 2026 \u2014 Inside SQ321: Key findings from Singapore's final investigation report ... Singapore Airlines aircraft for flight SQ321 parked on the ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "channelnewsasia.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"Singapore\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://law.justia.com/cases/federal/district-courts/FSupp/561/1148/1894780/",
+      "title": "Farmilant v. Singapore Airlines, Ltd., 561 F. Supp. 1148 ...",
+      "snippet": "Eugene Farmilant (\"Farmilant\") sues Singapore Airlines, Ltd. (\"Airline\"), alleging fraudulent misrepresentation, \"tortious breach of contract,\" negligence and ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "law.justia.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"Singapore\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.elitigation.sg/gd/gd/2000_SGCA_66/pdf",
+      "title": "Singapore Airlines Ltd and Another v Fujitsu ...",
+      "snippet": "On 17 April 1996, seven packages of flash memory integrated circuit (IC) dies were shipped from. Tokyo to Kuala Lumpur via Singapore by Singapore Airlines Ltd ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "elitigation.sg",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"Singapore\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.cambridge.org/core/journals/international-law-reports/article/civil-aeronautics-administration-v-singapore-airlines-limited/CE42F9FD208E063E2D23D08D426FB636",
+      "title": "Civil Aeronautics Administration v. Singapore Airlines Limited",
+      "snippet": "On 31 October 2000, a passenger airliner operated by Singapore Airlines (\u201cSIA\u201d), a company incorporated in Singapore, crashed while taking off at an airport in ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "cambridge.org",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"Singapore\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.singaporeair.com/en_UK/sg/global_footer/privacy-policy/",
+      "title": "Singapore Airlines Privacy Policy",
+      "snippet": "12 Sept 2025 \u2014 This Privacy Policy applies to Singapore Airlines Limited (\u201cSIA\u201d). SIA is a corporation registered in the Republic of Singapore with company ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "singaporeair.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" regulatory enforcement legal action"
+    },
+    {
+      "url": "https://sg.indeed.com/q-legal-singapore-airlines-jobs.html",
+      "title": "Legal singapore airlines jobs",
+      "snippet": "26 Legal Singapore Airlines jobs available on Indeed.com. Apply to Operator, Manager of Business Development, X-ray Technician and more!",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "sg.indeed.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" regulatory enforcement legal action"
+    },
+    {
+      "url": "https://www.nextlevelurgentcare.com/wp-content/uploads/formidable/25/airliinter1250.pdf",
+      "title": "Navigating Regulatory Compliance with Singapore Airlines ...",
+      "snippet": "3 Jun 2026 \u2014 Singapore Airlines takes this regulatory ... Yes, Singapore Airlines has a formal dispute resolution process that we can help you navigate.Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "nextlevelurgentcare.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" regulatory enforcement legal action"
+    },
+    {
+      "url": "https://sg.linkedin.com/jobs/view/compliance-executive-kris%2B-at-singapore-airlines-4125638527",
+      "title": "Compliance Executive, Kris+ - Singapore Airlines",
+      "snippet": "See who Singapore Airlines has hired for this role. No longer accepting ... Legal & Compliance Operations Executive. YSQ International. Singapore ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "sg.linkedin.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" regulatory enforcement legal action"
+    },
+    {
+      "url": "https://www.facebook.com/groups/visitsingapore/posts/4265929500219886/",
+      "title": "Is Singapore Airlines system failure standard practice?",
+      "snippet": "Is this standard practice of Singapore Airlines? Due to Singapore Airlines system failure, we were blocked from boarding our flight, leaving us stranded ...",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "facebook.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" regulatory enforcement legal action"
+    },
+    {
+      "url": "https://www.elitigation.sg/gd/gd/2004_SGHC_263/pdf",
+      "title": "Ang Ming Chuang v Singapore Airlines Ltd (Civil ...",
+      "snippet": "24 Nov 2004 \u2014 1. The plaintiff, Ang Ming Chuang (\u201cAng\u201d), initiated this action in or about October 2002 against the defendant, Singapore Airlines Limited ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "elitigation.sg",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" regulatory enforcement legal action"
+    },
+    {
+      "url": "https://www.accc.gov.au/media-release/cathay-pacific-and-singapore-airlines-to-pay-23-million-in-penalties-for-price-fixing",
+      "title": "Cathay Pacific and Singapore Airlines to pay ...",
+      "snippet": "7 Dec 2012 \u2014 The Federal Court has ordered Cathay Pacific Airways Ltd and Singapore Airlines Cargo Pte Ltd to pay a total of $23 million in penalties for ...",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "accc.gov.au",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" regulatory enforcement legal action"
+    },
+    {
+      "url": "https://journalsonline.academypublishing.org.sg/Journals/Singapore-Academy-of-Law-Annual-Review-of-Singapore-Cases/e-Archive/ctl/eFirstSALPDFJournalView/mid/512/ArticleId/232/Citation/JournalsOnlinePDF",
+      "title": "Admiralty, Shipping And Aviation Law",
+      "snippet": "In the first of these, Civil Aeronautics Administration v Singapore Airlines Ltd [2004] 1 SLR 570, the Court of Appeal dismissed the appeal by Taiwan's Civil ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "journalsonline.academypublishing.org.sg",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" regulatory enforcement legal action"
+    },
+    {
+      "url": "https://www.mlex.com/mlex/articles/2463301/singapore-regulator-reviews-proposed-sia-vietnam-airlines-commercial-cooperation",
+      "title": "Singapore regulator reviews proposed SIA\u2013Vietnam ...",
+      "snippet": "9 Apr 2026 \u2014 Statement follows. Media Releases CCS Consults on the Proposed Cooperation between Singapore Airlines Limited and Vietnam Airlines JSC 8 April ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "mlex.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" regulatory enforcement legal action"
+    },
+    {
+      "url": "https://law.nus.edu.sg/wp-content/uploads/2020/04/018_2017_Umakanth-Lee-Jae-Woon.pdf",
+      "title": "Foreign Investment In India'S Airline Industry - Singapore",
+      "snippet": "by U Varottil \u2014 89 The aversion of Indian regulators to the entry of foreign airlines through equity investment in Indian companies dealt a fatal blow to the Singapore Airlines ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "law.nus.edu.sg",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" regulatory enforcement legal action"
+    },
+    {
+      "url": "https://www.prod.int.joc.com/article/singapore-airlines-seeks-end-to-sanctions-5293064",
+      "title": "Singapore Airlines Seeks End to Sanctions",
+      "snippet": "Singapore Airlines said Monday it was in talks to resolve sanctions imposed by the U.S. Treasury on.",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "prod.int.joc.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" sanctions OR watchlist OR OFAC"
+    },
+    {
+      "url": "https://www.proquest.com/trade-journals/singapore-airlines-wants-resolve-us-sanctions/docview/210540082/se-2",
+      "title": "Singapore Airlines wants to resolve US sanctions",
+      "snippet": "Singapore Airlines is working to resolve United States trade sanctions against its new Chinese air cargo joint venture. Great Wall Airlines, the... Show less.",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "proquest.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" sanctions OR watchlist OR OFAC"
+    },
+    {
+      "url": "https://live.deutsche-boerse.com/equity/singapore-airlines-ltd",
+      "title": "Singapore Airlines Ltd. Equity",
+      "snippet": "Singapore Airlines Ltd. share price in real-time (A0MZ57 / SG1V61937297), charts and analyses, news, key data, turnovers, company data.",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "live.deutsche-boerse.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" sanctions OR watchlist OR OFAC"
+    },
+    {
+      "url": "https://www.taipeitimes.com/News/biz/archives/2006/08/20/2003323995",
+      "title": "Singapore Airlines closes cargo unit over Iran link",
+      "snippet": "20 Aug 2006 \u2014 Singapore Airlines has suspended the operations of its cargo venture in China after Washington imposed sanctions on the airline's Chinese ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "taipeitimes.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" sanctions OR watchlist OR OFAC"
+    },
+    {
+      "url": "https://krisworld.singaporeair.com/krisworlddigital/movies/categories/all-movies.html",
+      "title": "Movies A-Z",
+      "snippet": "For passengers who had purchased a Wi-Fi plan, Singapore Airlines' liability shall be limited to the sum paid by the passenger for the Wi-Fi plan. In any other ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "krisworld.singaporeair.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" sanctions OR watchlist OR OFAC"
+    },
+    {
+      "url": "https://sso.agc.gov.sg/Browse/sl/Revoked/M/1?PageSize=250&SortBy=Title&SortOrder=ASC",
+      "title": "Browse Revoked/Spent Subsidiary Legislation - M",
+      "snippet": "Motor Vehicles (Third-Party Risks and Compensation) (2017 FORMULA 1\u1d40\u1d39 Singapore Airlines Singapore Grand Prix) (Exemption) Notification 2017 (Spent). S 497/2017.Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "sso.agc.gov.sg",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" sanctions OR watchlist OR OFAC"
+    },
+    {
+      "url": "https://www.adsoftheworld.com/campaigns/a-flight-of-avant-garde",
+      "title": "A Flight of Avant-Garde - Singapore Airlines",
+      "snippet": "This professional campaign titled 'A Flight of Avant-Garde' was published in Singapore in August, 2024. It was created for the brand: Singapore Airlines, by ad ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "adsoftheworld.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" sanctions OR watchlist OR OFAC"
+    },
+    {
+      "url": "https://www.singaporeair.com/content/dam/sia/web-assets/pdfs/about-us/corporate-policies/sia-anti-bribery-policy-statement.pdf",
+      "title": "sia group anti-bribery / anti-corruption statement",
+      "snippet": "Singapore Airlines Limited and its subsidiaries (\u201cSIA Group\u201d) are committed to complying with anti-bribery and anti-corruption laws applicable to its local ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "singaporeair.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"SIA\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.channelnewsasia.com/singapore/sq321-legal-action-singapore-airlines-investigation-turbulence-6131801",
+      "title": "SQ321 investigation leaves 'huge questions' unanswered ...",
+      "snippet": "20 May 2026 \u2014 ... Singapore Airlines (SIA), legal experts said. The full report, released on Tuesday (May 19), found that possible issues with the aircraft's ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "channelnewsasia.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"SIA\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.police.gov.sg/~/media/spf/files/resources/siascandal.pdf",
+      "title": "The CAD files - SIA scandal",
+      "snippet": "complaint from Singapore Airlines. (SIA) that Teo Cheng Kiat, then 47, had misappropriated funds from the com- pany. Teo had joined SIA as a clerk in. 1975 ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "police.gov.sg",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"SIA\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.singaporeair.com/en_UK/sg/about-us/supplier-portal/",
+      "title": "Supplier Portal",
+      "snippet": "Welcome to our supplier portal. At Singapore Airlines (SIA), we value our suppliers as critical partners in delivering exceptional passenger experiences and ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "singaporeair.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"SIA\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.singaporeair.com/it_IT/it/about-us/corporate-governance-policies/",
+      "title": "Corporate Policies",
+      "snippet": "You can play a part to help ensure that the SIA Group continues to be a safe ... The Singapore Airlines Group has prepared an Anti-Modern Slavery and ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "singaporeair.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"SIA\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://x.com/SingaporeAir/status/1795715639807713482?lang=en",
+      "title": "Singapore Airlines",
+      "snippet": "Singapore Airlines (SIA) acknowledges the Singapore Transport Safety Investigation Bureau's preliminary investigation findings on the incident ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "x.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"SIA\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.singaporeair.com/en_UK/sg/travel-info/customer-commitment/pax-rights-regulations-europe/",
+      "title": "Passenger Rights and Regulations | Singapore Airlines",
+      "snippet": "Find out about your passenger rights and regulations when travelling with Singapore Airlines. View our policies on baggage, delays, cancellations and more ... sia ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "singaporeair.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"SIA\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.elitigation.sg/gd/s/2004_SGCA_3",
+      "title": "Civil Aeronautics Administration v Singapore Airlines Ltd ...",
+      "snippet": "On 31 October 2000, flight SQ 006, operated by Singapore Airlines (\u201cSIA\u201d), a company incorporated in Singapore, crashed upon taking off, en route to Los ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "elitigation.sg",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"SIA\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Singapore_Airlines",
+      "title": "Singapore Airlines",
+      "snippet": "Singapore Airlines ( SIA or SQ ) is the flag carrier of Singapore with its hub located at Changi Airport. The airline flies a diverse fleet of 160 Airbus ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "en.wikipedia.org",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"Singapore Airlines Limited\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://lions.financial/investment-research-analysis-risk-management-singapore-airlines/",
+      "title": "Singapore Airlines Investment Research Analysis Risk ...",
+      "snippet": "Mr. Goh joined Singapore Airlines Limited in 1990 and has held senior management positions in various divisions in Singapore and overseas, ranging from ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "lions.financial",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"Singapore Airlines Limited\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.facebook.com/AeroTime.aero/posts/singapore-airlines-appoints-veteran-lawyer-adrian-chan-pengee-as-independent-dir/1626194759513174/",
+      "title": "Singapore Airlines appoints veteran lawyer Adrian Chan ...",
+      "snippet": "The share buyback scheme, announced in late July 2023, will see the listed entity, Singapore Airlines Limited, repurchase up to 148,711,715 ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "facebook.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"Singapore Airlines Limited\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://scamalytics.com/ip/103.6.106.0",
+      "title": "103.6.106.0 ( Singapore Airlines Limited ) Fraud Risk",
+      "snippet": "Fraud Score: 0. 100. IP address 103.6.106.0 is operated by Singapore Airlines Limited whose web traffic we consider to present a potentially low fraud risk.Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "scamalytics.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"Singapore Airlines Limited\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.pdpc.gov.sg/-/media/files/pdpc/pdf-files/responses-received-as-at-17-july-2019/singapore-airlines-limited.pdf",
+      "title": "Singapore Airlines Limited 17 July 2019 ... - PDPC",
+      "snippet": "17 Jul 2019 \u2014 This submission sets out Singapore Airlines Limited (\u201cSIA\u201d)'s comments on the public consultation by the Personal Data Protection Commission ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "pdpc.gov.sg",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"Singapore Airlines Limited\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.ccs.gov.sg/media-and-events/newsroom/announcements-and-media-releases/conditional-approval-given-after-cccs-accepts-commitments-for-sia--air-india-and-vistara-airline-transactions/",
+      "title": "Conditional Approval Given After CCCS Accepts ...",
+      "snippet": "5 Mar 2024 \u2014 ... Singapore Airlines Ltd (\u201cSIA\u201d) and Tata SIA Airlines Ltd (which ... CCCS may also consider issuing interim measures prior to the final ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "ccs.gov.sg",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" \"Singapore Airlines Limited\" fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.reuters.com/business/aerospace-defense/singapore-airlines-turbulence-investigation-not-yet-complete-ministry-says-2025-05-27/",
+      "title": "Singapore Airlines turbulence investigation not yet ...",
+      "snippet": "27 May 2025 \u2014 An investigation into a Singapore Airlines (SIAL.SI) flight last year that hit turbulence, injuring dozens of people and killing one, was still awaiting ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "reuters.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:reuters.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.reuters.com/article/business/autos-transportation/singapore-airlines-scraps-lifetime-loyalty-scheme-idUSSIN118787/",
+      "title": "Singapore Airlines scraps lifetime loyalty scheme",
+      "snippet": "27 Mar 2007 \u2014 Singapore Airlines, the world's biggest carrier by market value, on Tuesday defended its decision to scrap a lifetime loyalty programme.Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "reuters.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:reuters.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.reuters.com/company/singapore-airlines-ltd/",
+      "title": "Singapore Airlines Ltd",
+      "snippet": "The latest international Singapore Airlines Ltd news and views from Reuters - one of the world's largest news agencies.",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "reuters.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:reuters.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.reuters.com/business/aerospace-defense/singapore-airlines-offers-compensation-turbulence-flight-passengers-2024-06-11/",
+      "title": "Singapore Airlines offers compensation for flight hit by ...",
+      "snippet": "11 Jun 2024 \u2014 Singapore Airlines (SIAL.SI) has sent compensation offers to passengers on a flight last month from London to Singapore that ran into severe turbulence.Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "reuters.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:reuters.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.reuters.com/article/business/singapore-airlines-pays-33-million-fine-to-south-africa-idUSBRE82Q01F/",
+      "title": "Singapore Airlines pays $3.3 million fine to South Africa",
+      "snippet": "27 Mar 2012 \u2014 Singapore Airlines Ltd <SIAL.SI>, the world's second largest by market value, said on Tuesday it paid a fine of 25 million rand ($3.29 ...",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "reuters.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:reuters.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.reuters.com/world/asia-pacific/singapore-turbulence-flight-investigation-finds-sharp-altitude-drop-caused-2024-05-29/",
+      "title": "Singapore flight investigation finds sharp altitude drop ...",
+      "snippet": "29 May 2024 \u2014 Preliminary findings released on Wednesday of an investigation into a Singapore Airlines flight hit by severe turbulence last week showed ...",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "reuters.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:reuters.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.reuters.com/en/singapores-sia-engineering-signs-1-billion-services-deal-with-singapore-airlines-2025-05-20/",
+      "title": "Singapore's SIA Engineering signs ...",
+      "snippet": "20 May 2025 \u2014 Singapore's SIA Engineering on Tuesday signed a S$1.3 billion ($1 billion) services agreement with Singapore Airlines and its unit Scoot.",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "reuters.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:reuters.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.reuters.com/world/asia-pacific/singapore-says-investigators-have-data-flight-hit-by-turbulence-2024-05-24/",
+      "title": "Singapore says investigators have data for flight hit by ...",
+      "snippet": "24 May 2024 \u2014 The interior of Singapore Airlines flight SQ321 is pictured after an emergency landing at Bangkok's Suvarnabhumi International Airport, in ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "reuters.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:reuters.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.reuters.com/world/asia-pacific/injured-passengers-singapore-airlines-face-varied-compensation-2024-05-21/",
+      "title": "Injured passengers on Singapore Airlines face varied ...",
+      "snippet": "21 May 2024 \u2014 If passengers file a lawsuit, the airline cannot contest damages up to around $175,000. If a passenger seeks larger damages, Singapore Airlines ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "reuters.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:reuters.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.reuters.com/business/aerospace-defense/singapore-airlines-cut-4300-jobs-due-pandemic-most-its-history-2020-09-10/",
+      "title": "-Singapore Airlines to cut 4300 jobs due to pandemic, most ...",
+      "snippet": "10 Sept 2020 \u2014 Singapore Airlines Ltd said on Thursday it would cut 4300 positions, or around 20% of its staff, due to the debilitating impact of the ...",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "reuters.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:reuters.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.straitstimes.com/singapore/passenger-sues-sia-after-allergic-reaction-alleges-being-served-meal-that-contains-shrimp-despite",
+      "title": "Passenger sues SIA after allergic reaction, claims served ...",
+      "snippet": "20 Jun 2025 \u2014 A New-York based paediatrician is suing Singapore Airlines for allegedly serving her a meal containing shrimp even though she claimed she had notified the ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "straitstimes.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:straitstimes.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.straitstimes.com/singapore/courts-crime/ex-employee-of-sia-engineering-company-admits-to-cheating-charges-involving-over-96k",
+      "title": "Ex-employee of SIA Engineering Company admits ...",
+      "snippet": "28 Jan 2025 \u2014 Leong Siew Pui was working for Singapore Airlines Engineering Company (SIAEC) when he committed the offences in 2017. ... fraud at SIAEC.Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "straitstimes.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:straitstimes.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.straitstimes.com/singapore/transport/flight-sq321-radar-failed-to-detect-weather-that-likely-caused-severe-turbulence-probe-finds",
+      "title": "Flight SQ321: Radar may have failed to detect weather that ...",
+      "snippet": "The release of the final report comes almost two years after Singapore Airlines flight SQ321 experienced severe turbulence, resulting in one death and 79 people ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "straitstimes.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:straitstimes.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.straitstimes.com/singapore/transport/what-happened-on-the-turbulence-hit-sia-flight-that-left-one-dead-and-79-hurt",
+      "title": "What happened on the turbulence-hit SIA Flight SQ321?",
+      "snippet": "19 May 2026 \u2014 Singapore Airlines (SIA) Flight SQ321 hit severe turbulence as it flew over south-west Myanmar. A 73-year-old Briton died of heart failure ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "straitstimes.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:straitstimes.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.straitstimes.com/singapore/sia-among-5-major-carriers-facing-enforcement-action-in-the-uk-for-failing-to-compensate",
+      "title": "SIA among 5 carriers facing enforcement action in the UK ...",
+      "snippet": "22 Feb 2017 \u2014 Singapore Airlines is facing enforcement action by UK's Civil Aviation Authority for allegedly denying passengers compensation for flight delays ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "straitstimes.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:straitstimes.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.straitstimes.com/singapore/passengers-injured-on-turbulence-hit-singapore-airlines-flight-face-varied-compensation",
+      "title": "Passengers injured in turbulence-hit SIA flight could ...",
+      "snippet": "22 May 2024 \u2014 Passengers injured by severe turbulence on a Singapore Airlines (SIA) flight on May 21 are likely eligible for compensation, but the amount that each receives ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "straitstimes.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:straitstimes.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.straitstimes.com/singapore/transport/tigerair-to-fly-to-ipoh-from-may-29-tickets-on-sale-from-april-20",
+      "title": "Tigerair to fly to Ipoh from May 29; tickets on sale from April ...",
+      "snippet": "Tigerair which works closely with Singapore Airlines' long-haul budget carrier Scoot, will time its flights to allow passengers greater connectivity to other ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "straitstimes.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:straitstimes.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.straitstimes.com/singapore/courts-crime/8-months-jail-for-man-who-worked-with-sia-employee-to-get-bribe-of-over-207k",
+      "title": "8 months' jail for man who worked with SIA employee to get ...",
+      "snippet": "18 Sept 2023 \u2014 SINGAPORE \u2013 A man was sentenced to eight months' jail on Monday after he worked with a then Singapore Airlines (SIA) employee to obtain a ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "straitstimes.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:straitstimes.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.straitstimes.com/singapore/sia-warns-of-fake-websites-e-mails-social-media-accounts-claiming-to-be-from-airline",
+      "title": "SIA warns of fake websites, e-mails, social media accounts ...",
+      "snippet": "12 Aug 2024 \u2014 SINGAPORE \u2013 Singapore Airlines (SIA) has cautioned its customers about scams that use its name. In these scams, phishing websites, e-mails, ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "straitstimes.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:straitstimes.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.straitstimes.com/tags/singapore-airlines",
+      "title": "Latest Singapore Airlines",
+      "snippet": "Singapore Airlines News - Find latest News & top stories about Singapore Airlines. Get more information about Singapore Airlines at straitstimes.com.",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "straitstimes.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:straitstimes.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.channelnewsasia.com/singapore/passenger-sues-singapore-airlines-allergic-reaction-meal-containing-shrimp-5193976",
+      "title": "US passenger sues Singapore Airlines, claims allergic ...",
+      "snippet": "20 Jun 2025 \u2014 A New York-based paediatrician has sued Singapore Airlines (SIA) for allegedly serving her a meal containing shrimp when she had already informed crew members ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "channelnewsasia.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:channelnewsasia.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.channelnewsasia.com/singapore/sia-singapore-airlines-cabin-crew-member-sue-million-dismissed-court-falling-aircraft-4687601",
+      "title": "Court dismisses former flight steward's S$1.7 million suit ...",
+      "snippet": "18 Oct 2024 \u2014 A former cabin crew member, who sought over S$1.7 million (US$1.3 million) in damages from Singapore Airlines (SIA) after claiming to have slipped on a grease ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "channelnewsasia.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:channelnewsasia.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.channelnewsasia.com/singapore/singapore-airlines-sia-ordered-pay-3580-couple-india-faulty-recline-business-class-seats-4297401",
+      "title": "Singapore Airlines ordered to pay S$3580 to couple in ...",
+      "snippet": "27 Apr 2024 \u2014 Singapore Airlines ordered to pay S$3,580 to couple in India over faulty seats. The couple's business class seats had failed to electronically ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "channelnewsasia.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:channelnewsasia.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.channelnewsasia.com/singapore/man-jailed-syndicate-steal-business-class-singapore-airlines-5691776",
+      "title": "Man jailed for syndicated theft targeting business class ...",
+      "snippet": "23 Dec 2025 \u2014 SINGAPORE: A man who took a passenger's luggage on a Singapore Airlines flight from Dubai to Singapore was jailed for 20 months on Tuesday ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "channelnewsasia.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:channelnewsasia.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.channelnewsasia.com/singapore/singapore-airlines-corruption-project-207000-conspire-reservist-3697576",
+      "title": "Man conspired with fellow reservist to get S ...",
+      "snippet": "14 Aug 2023 \u2014 Man conspired with fellow reservist to get S$207,000 in bribes for Singapore Airlines projects. Rex Zhang Jiahao fed information about a tender ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "channelnewsasia.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:channelnewsasia.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.channelnewsasia.com/singapore/sia-singapore-airlines-cabin-crew-flight-attendant-grease-patch-fall-17million-4119751",
+      "title": "Former cabin crew member sues Singapore Airlines for S ...",
+      "snippet": "13 Feb 2024 \u2014 A former cabin crew member is seeking more than S$1.7 million (US$1.26 million) in damages from Singapore Airlines after allegedly slipping on a grease patch ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "channelnewsasia.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:channelnewsasia.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.channelnewsasia.com/topic/singapore-airlines",
+      "title": "Singapore Airlines latest news & coverage",
+      "snippet": "Business \u00b7 A 'long game': Singapore Airlines committed to Air India despite record US$2 billion loss, says CEO. about a month ago.Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "channelnewsasia.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:channelnewsasia.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    },
+    {
+      "url": "https://www.channelnewsasia.com/singapore/airline-vlogger-faces-backlash-including-death-threat-his-negative-review-singapore-airlines-5689846",
+      "title": "Airline vlogger faces backlash, including a death threat, for ...",
+      "snippet": "16 Jan 2020 \u2014 Airline vlogger faces backlash, including a death threat, for his negative review of Singapore Airlines. Airline vlogger faces backlash ...Read more",
+      "full_text": "",
+      "fetch_status": "snippet_only",
+      "source_domain": "channelnewsasia.com",
+      "publication_date": null,
+      "query": "\"Singapore Airlines\" site:channelnewsasia.com fraud OR corruption OR investigation OR enforcement OR lawsuit OR sanction"
+    }
+  ],
+  "total_queries_run": 8,
+  "total_results_fetched": 69,
+  "collection_mode": "live_serp_only",
+  "serp_configured": true,
+  "browser_configured": false,
+  "browser_fetches_attempted": 0
+}

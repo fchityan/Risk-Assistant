@@ -5,7 +5,9 @@ from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _BACKEND_DIR = Path(__file__).resolve().parent
-_ENV_FILE = _BACKEND_DIR / ".env"
+_REPO_ROOT = _BACKEND_DIR.parent
+_ROOT_ENV_FILE = _REPO_ROOT / ".env"
+_BACKEND_ENV_FILE = _BACKEND_DIR / ".env"
 
 # Placeholder values from the old env template — treated as "not configured"
 PLACEHOLDER_API_KEYS = frozenset(
@@ -56,6 +58,8 @@ class Settings(BaseSettings):
     bright_data_browser_cdp_host: str = DEFAULT_BROWSER_CDP_HOST
 
     daytona_api_key: str = ""
+    daytona_server_url: str = ""
+    daytona_target: str = "local"
 
     # LLM Stage 4 — provider: tokenrouter (default), openrouter, or kimi
     llm_provider: str = "tokenrouter"
@@ -72,7 +76,7 @@ class Settings(BaseSettings):
     sensenova_model: str = "SenseNova-5"
     kimi_api_key: str = ""
     kimi_base_url: str = "https://api.moonshot.ai/v1"
-    kimi_model: str = "moonshotai/Kimi-K2-Instruct"
+    kimi_model: str = "moonshot-v1-auto"
     llm_max_output_tokens: int = 4096
 
     # Stage 1.5 entity resolution
@@ -87,7 +91,7 @@ class Settings(BaseSettings):
     log_file: str = "logs/pipeline.log"
 
     model_config = SettingsConfigDict(
-        env_file=str(_ENV_FILE),
+        env_file=(str(_ROOT_ENV_FILE), str(_BACKEND_ENV_FILE)),
         env_file_encoding="utf-8",
         extra="ignore",
     )

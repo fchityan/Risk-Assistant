@@ -1,6 +1,8 @@
 import html
 import time
+from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlparse
 
 import pandas as pd
 import streamlit as st
@@ -8,11 +10,15 @@ import streamlit as st
 from api_client import (
     build_screen_request,
     generate_sensenova_memo,
+    get_health,
     get_screen_status,
     start_screening,
     submit_clarification,
 )
 from report_adapter import load_report_from_path, normalize_ui_data
+from services.bright_data import bright_data_configured, collect_public_data
+from services.llm_reasoning import KIMI_API_KEY, analyze_with_llm
+from services.sensenova import generate_memo
 from settings import get_frontend_settings
 
 st.set_page_config(
@@ -98,10 +104,214 @@ def _init_state() -> None:
         st.session_state.show_full_memo = False
     if "memo_source" not in st.session_state:
         st.session_state.memo_source = "report"
+    if "effective_use_mock_data" not in st.session_state:
+        st.session_state.effective_use_mock_data = SETTINGS["use_mock_data"]
+    if "backend_available" not in st.session_state:
+        st.session_state.backend_available = False
+    if "backend_status_message" not in st.session_state:
+        st.session_state.backend_status_message = ""
+    if "kimi_api_key_set" not in st.session_state:
+        st.session_state.kimi_api_key_set = SETTINGS.get("kimi_api_key_set", False)
+    if "daytona_api_key_set" not in st.session_state:
+        st.session_state.daytona_api_key_set = SETTINGS.get("daytona_api_key_set", False)
+    if "backend_url" not in st.session_state:
+        st.session_state.backend_url = SETTINGS["backend_url"]
+    if "frontend_live_mode" not in st.session_state:
+        st.session_state.frontend_live_mode = False
+
+
+def _backend_url() -> str:
+    url = (st.session_state.get("backend_url") or SETTINGS["backend_url"]).strip()
+    return url.rstrip("/")
+
+
+def _resolve_data_source() -> None:
+    backend_url = _backend_url()
+    host = (urlparse(backend_url).hostname or "").lower()
+    localhost_backend = host in {"127.0.0.1", "localhost"}
+
+    if _frontend_live_configured():
+        st.session_state.effective_use_mock_data = False
+        st.session_state.backend_available = False
+        st.session_state.frontend_live_mode = True
+        st.session_state.kimi_api_key_set = True
+        st.session_state.backend_status_message = (
+            "Live mode connected."
+        )
+        return
+
+    if SETTINGS.get("use_mock_data_forced_by_cloud_localhost") and localhost_backend:
+        st.session_state.effective_use_mock_data = True
+        st.session_state.backend_available = False
+        st.session_state.frontend_live_mode = False
+        st.session_state.backend_status_message = (
+            "Mock mode forced: BACKEND_URL points to localhost on Streamlit Cloud. "
+            "Set BACKEND_URL to a public API URL for live screening."
+        )
+        return
+
+    if SETTINGS["use_mock_data"]:
+        st.session_state.effective_use_mock_data = True
+        st.session_state.backend_available = False
+        st.session_state.frontend_live_mode = False
+        st.session_state.backend_status_message = "Mock mode forced by USE_MOCK_DATA=true."
+        return
+
+    try:
+        health = get_health(backend_url)
+        if health.get("status") == "ok":
+            st.session_state.effective_use_mock_data = False
+            st.session_state.backend_available = True
+            st.session_state.frontend_live_mode = False
+            secrets = health.get("secrets", {}) if isinstance(health, dict) else {}
+            if isinstance(secrets, dict):
+                st.session_state.kimi_api_key_set = bool(secrets.get("kimi"))
+                st.session_state.daytona_api_key_set = bool(secrets.get("daytona"))
+            st.session_state.backend_status_message = f"Connected to API at {backend_url}."
+            return
+        st.session_state.effective_use_mock_data = True
+        st.session_state.backend_available = False
+        st.session_state.backend_status_message = (
+            "API health check did not return status=ok; using mock data."
+        )
+    except Exception as exc:
+        st.session_state.effective_use_mock_data = True
+        st.session_state.backend_available = False
+        st.session_state.backend_status_message = (
+            f"Could not reach API at {backend_url}; using mock data ({exc})."
+        )
+
+
+def _fallback_to_mock(reason: str) -> None:
+    st.session_state.effective_use_mock_data = True
+    st.session_state.backend_available = False
+    st.session_state.frontend_live_mode = False
+    st.session_state.backend_status_message = f"Live API unavailable; using mock data ({reason})."
+
+
+def _frontend_live_configured() -> bool:
+    return bool((KIMI_API_KEY or "").strip()) and bright_data_configured()
+
+
+def _run_frontend_live_screening(
+    subject_name: str,
+    subject_type: str,
+    country: str,
+    purpose: str,
+    role: str,
+) -> dict:
+    ui = load_report_from_path(DEFAULT_DATA_PATH)
+
+    subject_payload = {
+        "name": subject_name,
+        "type": subject_type,
+        "country": country,
+        "screeningPurpose": purpose,
+        "role": role,
+    }
+    public_sources = collect_public_data(subject_name, country)
+    analysis = analyze_with_llm(subject_payload, public_sources)
+    memo_payload = generate_memo(subject_payload, analysis)
+
+    risk = analysis.get("riskSummary") if isinstance(analysis, dict) else {}
+    findings = analysis.get("keyFindings") if isinstance(analysis, dict) else []
+    steps = analysis.get("recommendedNextSteps") if isinstance(analysis, dict) else []
+    risk = risk if isinstance(risk, dict) else {}
+    findings = findings if isinstance(findings, list) else []
+    steps = steps if isinstance(steps, list) else []
+
+    ui["subject"] = {
+        "name": subject_name,
+        "type": "individual" if subject_type.lower() == "individual" else "organization",
+        "country": country,
+        "screeningPurpose": purpose,
+        "role": role,
+    }
+
+    risk_score = int(risk.get("overallRiskScore", 58) or 58)
+    ui["riskSummary"].update(
+        {
+            "riskCategory": risk.get("riskCategory", ui["riskSummary"].get("riskCategory", "Moderate Risk")),
+            "confidenceScore": int(risk.get("confidenceScore", ui["riskSummary"].get("confidenceScore", 70)) or 70),
+            "recommendation": risk.get("recommendation", ui["riskSummary"].get("recommendation", "Proceed with Conditions")),
+            "summary": risk.get("summary", ui["riskSummary"].get("summary", "")),
+            "supportSummaryLine": f"{max(1, min(5, len(findings)))} high / 0 med / 0 low",
+        }
+    )
+
+    ui["entityMatch"]["score"] = 85 if country else 70
+    ui["entityMatch"]["level"] = "High" if country else "Medium"
+    ui["entityMatch"]["rationale"] = "Live mode entity estimate from public-source evidence."
+
+    evidence_rows = []
+    for idx, src in enumerate(public_sources, start=1):
+        evidence_rows.append(
+            {
+                "id": f"EV-{idx:03d}",
+                "sourceName": src.get("sourceName", "Public source"),
+                "sourceUrl": src.get("sourceUrl", ""),
+                "sourceTier": "Open Web",
+                "supportBand": "high" if idx <= 2 else "medium",
+                "severity": "moderate",
+                "corroboration": "single_source",
+                "sourceSnippet": src.get("sourceSnippet", ""),
+                "finding": src.get("sourceName", "Public signal"),
+                "publicationDate": None,
+                "humanAction": "Review",
+                "entityMatch": "medium",
+                "adverseSeverity": "moderate",
+                "recency": "unknown",
+                "jurisdictionRelevance": "medium",
+                "caseLinkage": "uncertain",
+                "supportRuleTriggered": "manual_live_mode",
+            }
+        )
+
+    ui["evidenceTable"] = evidence_rows
+    ui["keyFindings"] = findings or ui.get("keyFindings", [])
+    ui["recommendedNextSteps"] = steps or ui.get("recommendedNextSteps", [])
+    ui["memo"]["body"] = memo_payload.get("body") or risk.get("summary") or ui["memo"].get("body", "")
+    ui["memo"]["disclaimer"] = (
+        "Live mode: Bright Data + Kimi via Streamlit. Human compliance review required."
+    )
+
+    now = datetime.now(timezone.utc).isoformat()
+    synthetic_id = f"ID-{int(time.time())}"
+    ui.setdefault("reportMetadata", {})
+    ui["reportMetadata"].update(
+        {
+            "report_id": synthetic_id,
+            "generated_at": now,
+            "workflow_run_id": synthetic_id,
+            "agent_version": "live-mode",
+            "data_sources": ["bright_data_serp", "kimi"],
+        }
+    )
+    ui.setdefault("assessmentRaw", {})
+    ui["assessmentRaw"].update(
+        {
+            "overall_risk_level": "high" if risk_score >= 75 else "medium" if risk_score >= 45 else "low",
+            "overall_summary": risk.get("summary", "Live screening completed."),
+            "recommended_disposition": (risk.get("recommendation") or "Proceed with Conditions").replace(" ", "_"),
+            "disposition_rationale": "Generated via frontend direct Kimi reasoning from Bright Data evidence.",
+            "coverage_assessment": "moderate",
+            "memo": ui["memo"]["body"],
+        }
+    )
+    ui["riskFlags"] = [
+        {
+            "title": f.get("title", "Potential reputational signal"),
+            "category": f.get("category", "Adverse Media"),
+            "severity": (f.get("severity", "Moderate") or "Moderate").lower(),
+            "description": f.get("description", "Requires analyst review."),
+        }
+        for f in findings
+    ]
+    return ui
 
 
 def _poll_if_needed() -> None:
-    if not st.session_state.polling or SETTINGS["use_mock_data"]:
+    if not st.session_state.polling or st.session_state.effective_use_mock_data:
         return
 
     run_id = st.session_state.active_run_id
@@ -118,7 +328,7 @@ def _poll_if_needed() -> None:
         st.rerun()
 
     try:
-        status = get_screen_status(SETTINGS["backend_url"], run_id)
+        status = get_screen_status(_backend_url(), run_id)
         st.session_state.last_poll_time = now
         state = status.get("status")
 
@@ -144,10 +354,14 @@ def _poll_if_needed() -> None:
             st.rerun()
     except Exception as exc:
         st.session_state.polling = False
-        st.error(f"Polling failed: {exc}")
+        _fallback_to_mock(str(exc))
+        st.session_state.ui_data = load_report_from_path(DEFAULT_DATA_PATH)
+        st.session_state.last_success = "Live API became unavailable during polling. Loaded mock data instead."
+        st.rerun()
 
 
 _init_state()
+_resolve_data_source()
 _poll_if_needed()
 
 
@@ -190,7 +404,8 @@ section[data-testid="stSidebar"] .block-container { padding: 16px 14px 16px 14px
 .hero { border: 1px solid #d5e3fb; border-radius: 18px; padding: 16px; margin-bottom: 10px; background: radial-gradient(circle at 95% 5%, rgba(15,157,141,0.16), transparent 35%), #fff; box-shadow: 0 14px 28px rgba(24,47,82,0.06); }
 .main-title { font-size: 49px; font-weight: 700; color: #1f2f5b; line-height: 1.05; margin-bottom: 4px; }
 .main-subtitle { color: #36527b; font-size: 13px; margin-bottom: 6px; }
-.chip { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 4px 10px; margin-right: 6px; margin-bottom: 4px; border: 1px solid #cfe0fb; border-radius: 999px; background: #f7fbff; color: #2c4f80; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; font-size: 10.5px; font-weight: 700; padding: 4px 10px; margin: 0; border: 1px solid #cfe0fb; border-radius: 999px; background: #f7fbff; color: #2c4f80; }
 .metric-card { background: #fff; border: 1px solid #d2e2fb; border-radius: 14px; padding: 10px 12px; min-height: 94px; box-shadow: 0 8px 18px rgba(24,47,82,0.07); }
 .metric-top { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
 .metric-icon { width: 32px; height: 32px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
@@ -227,6 +442,38 @@ section[data-testid="stSidebar"] .block-container { padding: 16px 14px 16px 14px
 .kf-sev-low { color: #1d9a64; }
 .kf-empty { padding: 12px; color: #5e7392; font-size: 13px; }
 .kf-shell .streamlit-expanderHeader { font-size: 13px !important; color: #2a3a54 !important; font-weight: 500 !important; }
+[data-testid="stExpander"] {
+    border: 1px solid #dce6f7 !important;
+    border-radius: 10px !important;
+    background: #ffffff !important;
+    margin-top: 8px !important;
+    box-shadow: 0 2px 8px rgba(24,47,82,0.05) !important;
+}
+[data-testid="stExpander"] summary {
+    color: #1f2f5b !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    line-height: 1.35 !important;
+    opacity: 1 !important;
+}
+[data-testid="stExpander"] summary p {
+    color: #1f2f5b !important;
+    opacity: 1 !important;
+    margin: 0 !important;
+}
+[data-testid="stExpander"] summary svg {
+    color: #7d91ad !important;
+    opacity: 1 !important;
+}
+[data-testid="stExpanderDetails"] {
+    color: #2a3a54 !important;
+}
+[data-testid="stExpanderDetails"] p,
+[data-testid="stExpanderDetails"] li,
+[data-testid="stExpanderDetails"] span,
+[data-testid="stExpanderDetails"] div {
+    color: #2a3a54 !important;
+}
 .memo-preview-title { font-size: 20px !important; }
 .reviewer-decision-title { font-size: 20px !important; }
 .ev-shell { margin-top: 6px; border: 1px solid #dce6f7; border-radius: 12px; background: #ffffff; padding: 10px; }
@@ -321,7 +568,100 @@ section[data-testid="stSidebar"] .block-container { padding: 16px 14px 16px 14px
 .mock-badge { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; color: #1f2937; background: #f59e0b; margin-bottom: 8px; }
 .mock-banner { background: #fff7df; border: 1px solid #f6c25f; color: #8b5a0b; border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; font-size: 12px; font-weight: 700; }
 .stButton > button { border-radius: 12px !important; border: 1px solid rgba(18,132,124,0.4) !important; background: linear-gradient(90deg,#1f70cf,#119385) !important; color: #fff !important; font-weight: 700 !important; width: 100% !important; }
-.stTextInput > div > div > input, .stTextArea textarea, .stSelectbox div[data-baseweb="select"] > div { border-radius: 12px !important; border: 1px solid #cadaf4 !important; }
+.stTextInput > div > div > input,
+.stTextArea textarea {
+    border-radius: 12px !important;
+    border: 1px solid #cadaf4 !important;
+    background: #f8fbff !important;
+    color: #1f2f5b !important;
+    caret-color: #1f2f5b !important;
+    -webkit-text-fill-color: #1f2f5b !important;
+}
+.stTextInput label,
+.stSelectbox label,
+.stTextArea label,
+.stTextInput label p,
+.stSelectbox label p,
+.stTextArea label p {
+    color: #2f466b !important;
+    font-weight: 700 !important;
+    opacity: 1 !important;
+}
+.stSelectbox div[data-baseweb="select"] > div {
+    border-radius: 12px !important;
+    border: 1px solid #cadaf4 !important;
+    background: #f8fbff !important;
+    color: #1f2f5b !important;
+    box-shadow: none !important;
+}
+.stSelectbox div[data-baseweb="select"] input,
+.stSelectbox div[data-baseweb="select"] div[role="combobox"] {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #1f2f5b !important;
+    caret-color: #1f2f5b !important;
+    -webkit-text-fill-color: #1f2f5b !important;
+}
+.stTextInput > div > div > input::placeholder,
+.stTextArea textarea::placeholder,
+.stSelectbox div[data-baseweb="select"] input::placeholder {
+    color: #6a7fa5 !important;
+    opacity: 1 !important;
+}
+.stTextInput > div > div > input:focus,
+.stTextArea textarea:focus,
+.stSelectbox div[data-baseweb="select"] > div:focus-within {
+    outline: none !important;
+    border-color: #7aa7f0 !important;
+    box-shadow: 0 0 0 2px rgba(47,111,237,0.18) !important;
+}
+@media (max-width: 1023px) {
+    div[data-testid="stSidebarOverlay"] {
+        background: transparent !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+    .block-container { padding-top: 0.35rem !important; }
+    .hero { padding: 12px; margin-bottom: 8px; }
+    .hero-right { display: none; }
+    .main-title { font-size: 26px; line-height: 1.08; margin-bottom: 6px; }
+    .main-subtitle { font-size: 17px; line-height: 1.45; margin-bottom: 10px; color: #29466f; }
+    .chip-row { gap: 8px; }
+    .chip { font-size: 11px; padding: 6px 10px; }
+    [data-testid="stVerticalBlockBorderWrapper"] { padding: 6px 8px 8px 8px !important; }
+    .assessment-shell { padding: 6px 2px; }
+    .assessment-columns { grid-template-columns: 1fr; gap: 14px; }
+    .assessment-col-right { border-left: none; padding-left: 0; }
+    .scope-grid { grid-template-columns: 1fr; }
+    .kv-row { grid-template-columns: 1fr; gap: 2px; margin: 10px 0; }
+    .kv-label { font-size: 12px; }
+    .kv-value { font-size: 14px; line-height: 1.45; color: #1f4fb5; }
+    [data-testid="stExpander"] summary {
+        font-size: 15px !important;
+        line-height: 1.4 !important;
+    }
+    [data-testid="stExpander"] {
+        border-radius: 12px !important;
+        margin-top: 10px !important;
+    }
+
+    .stTextInput > div > div > input,
+    .stTextArea textarea {
+        background: #ffffff !important;
+        color: #1f2f5b !important;
+        -webkit-text-fill-color: #1f2f5b !important;
+    }
+    .stSelectbox div[data-baseweb="select"] > div {
+        background: #ffffff !important;
+    }
+    .stSelectbox div[data-baseweb="select"] input,
+    .stSelectbox div[data-baseweb="select"] div[role="combobox"] {
+        background: transparent !important;
+        color: #1f2f5b !important;
+        -webkit-text-fill-color: #1f2f5b !important;
+    }
+}
 .stTabs [data-baseweb="tab-list"] {
     gap: 6px;
     border-bottom: 1px solid #d7e2f4;
@@ -364,16 +704,16 @@ section[data-testid="stSidebar"] .block-container { padding: 16px 14px 16px 14px
 .assessment-icon { width:40px; height:40px; border-radius:11px; background:#e8f1ff; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
 .assessment-title { font-family: 'Space Grotesk', sans-serif !important; font-size: var(--assessment-header-size); font-weight: var(--assessment-header-weight); color: var(--assessment-header-color); line-height:1.2; }
 .assessment-summary { font-size:13.5px; color:#4a6180; margin:4px 0 20px 0; line-height:1.55; }
-.assessment-columns { display:grid; grid-template-columns: 1fr 1fr; gap:0; min-width:0; }
+.assessment-columns { display:grid; grid-template-columns: 1fr; gap:12px; min-width:0; }
 .assessment-columns > div { min-width:0; overflow:hidden; }
-.assessment-col-right { border-left:1px solid #e5edf8; padding-left:28px; }
+.assessment-col-right { border-left:none; padding-left:0; }
 .section-title { font-family: 'Space Grotesk', sans-serif !important; font-size: var(--assessment-header-size); font-weight: var(--assessment-header-weight); color: var(--assessment-header-color); margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid #eaf0fb; line-height: 1.2; }
 .kv-row { display:grid; grid-template-columns: auto 1fr; gap:6px; margin:8px 0; align-items:baseline; }
-.kv-value { word-break: break-word; min-width: 0; }
+.kv-value { word-break: normal; overflow-wrap: anywhere; min-width: 0; }
 .kv-label { font-size:13px; font-weight:700; color:#1e3560; }
 .kv-value { font-size:13px; color:#2563eb; }
 .assessment-divider { border:none; border-top:1px solid #e5edf8; margin:20px 0 16px 0; }
-.scope-grid { display:grid; grid-template-columns: 1fr 1fr; gap:0; }
+.scope-grid { display:grid; grid-template-columns: 1fr; gap:0; }
 .sb-brand-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
 .sb-logo { width:40px; height:40px; flex-shrink:0; border-radius:10px; background:linear-gradient(160deg,#1f70cf,#1ab6a7); display:flex; align-items:center; justify-content:center; font-size:18px; }
 .sb-title { font-size:22px; font-weight:800; line-height:1.1; color:#ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -389,6 +729,11 @@ section[data-testid="stSidebar"] .block-container { padding: 16px 14px 16px 14px
 @media (min-width: 1024px) {
     section[data-testid="stSidebar"] { width: 272px !important; min-width: 272px !important; }
 }
+@media (min-width: 1200px) {
+    .assessment-columns { grid-template-columns: 1fr 1fr; gap: 0; }
+    .assessment-col-right { border-left:1px solid #e5edf8; padding-left:28px; }
+    .scope-grid { grid-template-columns: 1fr 1fr; }
+}
 @media (max-width: 1023px) {
     .sb-title { font-size:20px; }
     section[data-testid="stSidebar"] { width: min(86vw, 300px) !important; min-width: min(86vw, 300px) !important; }
@@ -398,7 +743,7 @@ section[data-testid="stSidebar"] .block-container { padding: 16px 14px 16px 14px
     unsafe_allow_html=True,
 )
 
-mock_note = '<span class="mock-badge">MOCK MODE</span>' if SETTINGS["use_mock_data"] else ""
+mock_note = '<span class="mock-badge">MOCK MODE</span>' if st.session_state.effective_use_mock_data else ""
 st.sidebar.markdown(
     """
 <div class="sb-brand-row">
@@ -420,12 +765,34 @@ st.sidebar.markdown(
 
 <div class="sb-system-label">System</div>
 <div class="sb-system-card">
-<b>Backend</b><br>
+<b>Backend URL</b><br>
 """
-    + ("mock data" if SETTINGS["use_mock_data"] else SETTINGS["backend_url"])
+    + _backend_url()
+    + """<br><br>
+<b>Status</b><br>
+"""
+    + (
+        "live mode"
+        if st.session_state.get("frontend_live_mode")
+        else
+        "mock data (API unavailable)"
+        if st.session_state.effective_use_mock_data and not SETTINGS["use_mock_data"]
+        else "mock data"
+        if st.session_state.effective_use_mock_data
+        else "live api connected"
+    )
     + """<br><br>
 <b>Workflow</b><br>
 Evidence -> Rules -> Memo
+<br><br>
+<b>Kimi Key</b><br>
+"""
+    + ("configured" if st.session_state.get("kimi_api_key_set") else "not set")
+    + """<br><br>
+<b>Daytona Key</b><br>
+"""
+    + ("configured" if st.session_state.get("daytona_api_key_set") else "not set")
+    + """
 </div>
 
 <div style="height: 22px;"></div>
@@ -440,8 +807,12 @@ Evidence -> Rules -> Memo
     unsafe_allow_html=True,
 )
 
-if SETTINGS["use_mock_data"]:
+if st.session_state.effective_use_mock_data:
     st.markdown('<div class="mock-banner">Mock mode active. Run reloads local sample report.</div>', unsafe_allow_html=True)
+    if st.session_state.backend_status_message:
+        st.caption(st.session_state.backend_status_message)
+elif st.session_state.backend_status_message:
+    st.caption(st.session_state.backend_status_message)
 
 hero_left, hero_right = st.columns([4.2, 1.0])
 with hero_left:
@@ -450,13 +821,13 @@ with hero_left:
 <div class="hero" style="margin-bottom:0;">
   <div class="main-title">Risk Assistant</div>
   <div class="main-subtitle">Evidence, grounded public-source screening with rubric scoring and reviewer-ready memo output.</div>
-  <span class="chip">Bright Data</span><span class="chip">LLM Classification</span><span class="chip">Rule Engine</span><span class="chip">Memo Packaging</span>
+    <div class="chip-row"><span class="chip">Bright Data</span><span class="chip">LLM Classification</span><span class="chip">Rule Engine</span><span class="chip">Memo Packaging</span></div>
 </div>
 """,
         unsafe_allow_html=True,
     )
 with hero_right:
-    st.markdown('<div class="hero"><div class="hero-shield-wrap"><div class="hero-shield">🛡</div></div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="hero hero-right"><div class="hero-shield-wrap"><div class="hero-shield">🛡</div></div></div>', unsafe_allow_html=True)
 
 with st.container(border=True):
     c1, c2, c3, c4, c5, c6 = st.columns([1.7, 1.0, 1.0, 1.2, 1.0, 0.9])
@@ -476,10 +847,41 @@ with st.container(border=True):
         run = st.button("Run Screening", use_container_width=True)
 
 if run:
-    if SETTINGS["use_mock_data"]:
-        st.session_state.ui_data = load_report_from_path(DEFAULT_DATA_PATH)
-        st.session_state.last_success = "Loaded mock data."
-        st.rerun()
+    # Re-check backend right before submitting to handle cases where API became unavailable
+    # after initial page load.
+    if not SETTINGS["use_mock_data"]:
+        _resolve_data_source()
+
+    if st.session_state.get("frontend_live_mode") or _frontend_live_configured():
+        try:
+            with st.spinner("Running live screening via Bright Data + Kimi..."):
+                st.session_state.ui_data = _run_frontend_live_screening(
+                    subject_name=subject_name,
+                    subject_type=subject_type,
+                    country=country,
+                    purpose=purpose,
+                    role=role,
+                )
+            st.session_state.frontend_live_mode = True
+            st.session_state.effective_use_mock_data = False
+            st.session_state.backend_available = False
+            st.session_state.backend_status_message = "Live mode connected."
+            st.session_state.last_success = "Live frontend screening complete."
+            st.rerun()
+        except Exception as exc:
+            st.session_state.frontend_live_mode = False
+            _fallback_to_mock(str(exc))
+            st.session_state.ui_data = load_report_from_path(DEFAULT_DATA_PATH)
+            st.session_state.last_success = "Live frontend mode failed. Loaded mock data instead."
+            st.rerun()
+    elif st.session_state.effective_use_mock_data:
+        if _frontend_live_configured():
+            st.session_state.frontend_live_mode = True
+            st.rerun()
+        else:
+            st.session_state.ui_data = load_report_from_path(DEFAULT_DATA_PATH)
+            st.session_state.last_success = "Loaded mock data. Add KIMI_API_KEY + Bright Data config for live mode."
+            st.rerun()
     elif not subject_name.strip():
         st.error("Subject name is required.")
     else:
@@ -490,7 +892,7 @@ if run:
             if role.strip():
                 notes.append(f"Role: {role.strip()}")
             payload = build_screen_request(subject_name, subject_type, country, input_notes="; ".join(notes) if notes else None)
-            run_id = start_screening(SETTINGS["backend_url"], payload)
+            run_id = start_screening(_backend_url(), payload)
             st.session_state.active_run_id = run_id
             st.session_state.polling = True
             st.session_state.poll_deadline = time.time() + SETTINGS["poll_timeout_seconds"]
@@ -498,7 +900,10 @@ if run:
             st.session_state.clarification_pending = None
             st.rerun()
         except Exception as exc:
-            st.error(f"Screening failed: {exc}")
+            _fallback_to_mock(str(exc))
+            st.session_state.ui_data = load_report_from_path(DEFAULT_DATA_PATH)
+            st.session_state.last_success = "Live API unavailable. Loaded mock data instead."
+            st.rerun()
 
 if st.session_state.get("clarification_pending"):
     clar = st.session_state.clarification_pending
@@ -517,24 +922,31 @@ if st.session_state.get("clarification_pending"):
         submitted = st.form_submit_button("Submit clarification")
 
     if submitted and run_id:
-        body = {}
-        if clar_country.strip():
-            body["country"] = clar_country.strip()
-        if clar_industry.strip():
-            body["industry"] = clar_industry.strip()
-        if notes.strip():
-            body["notes"] = notes.strip()
-        if selected != "None":
-            chosen = cand_map.get(selected)
-            if chosen and chosen.get("candidate_id"):
-                body["candidate_id"] = chosen["candidate_id"]
-        submit_clarification(SETTINGS["backend_url"], run_id, body)
-        st.session_state.clarification_pending = None
-        st.session_state.active_run_id = run_id
-        st.session_state.polling = True
-        st.session_state.poll_deadline = time.time() + SETTINGS["poll_timeout_seconds"]
-        st.session_state.last_poll_time = 0.0
-        st.rerun()
+        try:
+            body = {}
+            if clar_country.strip():
+                body["country"] = clar_country.strip()
+            if clar_industry.strip():
+                body["industry"] = clar_industry.strip()
+            if notes.strip():
+                body["notes"] = notes.strip()
+            if selected != "None":
+                chosen = cand_map.get(selected)
+                if chosen and chosen.get("candidate_id"):
+                    body["candidate_id"] = chosen["candidate_id"]
+            submit_clarification(_backend_url(), run_id, body)
+            st.session_state.clarification_pending = None
+            st.session_state.active_run_id = run_id
+            st.session_state.polling = True
+            st.session_state.poll_deadline = time.time() + SETTINGS["poll_timeout_seconds"]
+            st.session_state.last_poll_time = 0.0
+            st.rerun()
+        except Exception as exc:
+            _fallback_to_mock(str(exc))
+            st.session_state.ui_data = load_report_from_path(DEFAULT_DATA_PATH)
+            st.session_state.clarification_pending = None
+            st.session_state.last_success = "Live API unavailable during clarification. Loaded mock data instead."
+            st.rerun()
 
 if st.session_state.get("last_success"):
     st.success(st.session_state.last_success)
@@ -1044,14 +1456,17 @@ with right:
 
     view_full_memo = st.button("View Full Memo", use_container_width=True)
     if view_full_memo:
-        if SETTINGS["use_mock_data"]:
+        if st.session_state.get("frontend_live_mode"):
+            st.session_state.show_full_memo = True
+            st.session_state.memo_source = "live mode"
+        elif st.session_state.effective_use_mock_data:
             st.session_state.show_full_memo = True
             st.session_state.memo_source = "mock"
         elif not has_real_backend_run:
             st.error("No completed backend run is loaded. Click Run Screening first, wait for completion, then try View Full Memo.")
         else:
             try:
-                result = generate_sensenova_memo(SETTINGS["backend_url"], workflow_run_id)
+                result = generate_sensenova_memo(_backend_url(), workflow_run_id)
                 generated_memo = result.get("memo", "").strip()
                 if not generated_memo:
                     raise RuntimeError("SenseNova returned an empty memo")

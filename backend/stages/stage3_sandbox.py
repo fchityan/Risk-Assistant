@@ -5,9 +5,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from config import get_settings
+from logging_config import get_logger
 
 PROCESSING_DIR = Path(__file__).resolve().parent.parent / "processing"
 PROCESS_SCRIPT = PROCESSING_DIR / "process.py"
+logger = get_logger(__name__)
 
 
 def _process_locally(raw_items: list[dict], subject: dict) -> dict:
@@ -23,11 +25,31 @@ def _process_locally(raw_items: list[dict], subject: dict) -> dict:
 
 
 def _process_in_daytona(raw_items: list[dict], subject: dict) -> dict:
-    from daytona_sdk import Daytona, CreateSandboxParams
+    from daytona_sdk import Daytona
 
     settings = get_settings()
-    daytona = Daytona(api_key=settings.daytona_api_key)
-    sandbox = daytona.create(CreateSandboxParams(language="python"))
+
+    try:
+        # Newer SDK style: Daytona(DaytonaConfig(...)) + CreateWorkspaceParams
+        from daytona_sdk import CreateWorkspaceParams, DaytonaConfig
+
+        if not settings.daytona_server_url:
+            raise RuntimeError("DAYTONA_SERVER_URL is required for current daytona-sdk")
+
+        daytona = Daytona(
+            DaytonaConfig(
+                api_key=settings.daytona_api_key,
+                server_url=settings.daytona_server_url,
+                target=settings.daytona_target or "local",
+            )
+        )
+        sandbox = daytona.create(CreateWorkspaceParams(language="python"))
+    except ImportError:
+        # Legacy SDK style kept for backwards compatibility.
+        from daytona_sdk import CreateSandboxParams
+
+        daytona = Daytona(api_key=settings.daytona_api_key)
+        sandbox = daytona.create(CreateSandboxParams(language="python"))
 
     try:
         sandbox.fs.upload_file("process.py", PROCESS_SCRIPT.read_bytes())
@@ -64,7 +86,8 @@ def run_stage3(checkpoint2: dict) -> dict:
         try:
             processing_result = _process_in_daytona(raw_items, subject)
             mode = "daytona"
-        except Exception:
+        except Exception as e:
+            logger.warning("Daytona processing failed, using local fallback: %s", e)
             processing_result = _process_locally(raw_items, subject)
             mode = "local_fallback"
     else:
