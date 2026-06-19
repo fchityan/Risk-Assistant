@@ -120,6 +120,7 @@ See [backend/README.md](backend/README.md) and [frontend/README.md](frontend/REA
 - [docs/README.md](docs/README.md) — index of all docs, schemas, and examples
 - [docs/integration.md](docs/integration.md) — run both services, API contract, report mapping
 - [docs/architecture.md](docs/architecture.md) — pipeline stages and checkpoints
+- [docs/style-guide.md](docs/style-guide.md) — UI typography, colors, and component patterns
 - [backend/README.md](backend/README.md) — endpoints, env, demo, logging
 - [frontend/README.md](frontend/README.md) — UI setup and modules
 

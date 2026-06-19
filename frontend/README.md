@@ -90,6 +90,9 @@ Subject type mapping (UI label → API):
 | `style_loader.py` | Loads `static/base.css` and `static/panels.css` |
 | `static/base.css` | App shell, sidebar, forms, tabs, responsive layout |
 | `static/panels.css` | Dashboard panel and table styles |
+
+UI conventions (colors, typography, panel patterns): [docs/style-guide.md](../docs/style-guide.md)
+
 | `api_client.py` | HTTP client for backend endpoints |
 | `env_shared.py` | Loads shared root/backend `.env` |
 | `report_adapter.py` | v1 report JSON → UI view model |

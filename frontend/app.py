@@ -86,6 +86,19 @@ def _kv_rows(pairs: list[tuple[str, str]]) -> str:
     return "".join(rows)
 
 
+def _severity_badge_class(severity: str) -> str:
+    level = (severity or "").strip().lower()
+    if level in {"high", "critical"}:
+        return "rf-badge rf-badge-high"
+    if level in {"medium", "moderate"}:
+        return "rf-badge rf-badge-medium"
+    return "rf-badge rf-badge-low"
+
+
+def _table_empty_row(colspan: int, message: str) -> str:
+    return f"<tr><td colspan='{colspan}' class='table-empty'>{html.escape(message)}</td></tr>"
+
+
 def _init_state() -> None:
     if "ui_data" not in st.session_state:
         st.session_state.ui_data = load_report_from_path(DEFAULT_DATA_PATH)
@@ -399,7 +412,7 @@ st.sidebar.markdown(
 """
     + mock_note
     + """
-<hr style="border:0;border-top:1px solid rgba(200,225,255,0.22);margin:10px 0;">
+<hr class="sidebar-divider">
 <div class="sb-nav-item sb-nav-item-active">🏠 &nbsp;Dashboard</div>
 <div class="sb-nav-item">🔍 &nbsp;Screenings</div>
 <div class="sb-nav-item">⚙️ &nbsp;Rules</div>
@@ -438,7 +451,7 @@ Evidence -> Rules -> Memo
     + """
 </div>
 
-<div style="height: 22px;"></div>
+<div class="sidebar-spacer"></div>
 <div class="sb-profile">
     <div class="sb-profile-avatar">RA</div>
     <div>
@@ -461,7 +474,7 @@ hero_left, hero_right = st.columns([4.2, 1.0])
 with hero_left:
     st.markdown(
         """
-<div class="hero" style="margin-bottom:0;">
+<div class="hero hero--flush">
   <div class="main-title">Risk Assistant</div>
   <div class="main-subtitle">Evidence, grounded public-source screening with rubric scoring and reviewer-ready memo output.</div>
     <div class="chip-row"><span class="chip">Bright Data</span><span class="chip">LLM Classification</span><span class="chip">Rule Engine</span><span class="chip">Memo Packaging</span></div>
@@ -486,7 +499,7 @@ with st.container(border=True):
     with c5:
         role = st.text_input("Role", subject.get("role", ""))
     with c6:
-        st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
+        st.markdown('<div class="form-spacer"></div>', unsafe_allow_html=True)
         run = st.button("Run Screening", use_container_width=True)
 
 if run:
@@ -616,7 +629,7 @@ support_line = risk.get("supportSummaryLine", f"{support_summary.get('high_suppo
 rule_count = len(triggered_rules)
 rule_caption = f"{rule_count} rule{'s' if rule_count != 1 else ''} triggered" if triggered_rules else "No rules triggered"
 st.markdown(f"""
-<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:12px;">
+<div class="metric-grid">
   <div class='metric-card'><div class='metric-top'><span class='metric-icon i-risk'>🛡️</span><div class='metric-label'>Overall Risk</div></div><div class='metric-v1'>{risk.get('riskCategory','Medium Risk')}</div><div class='metric-caption'>{assessment.get('overall_risk_level','medium').title()}</div></div>
   <div class='metric-card'><div class='metric-top'><span class='metric-icon i-evidence'>📋</span><div class='metric-label'>Evidence Support</div></div><div class='metric-v2'>{support_line}</div><div class='metric-caption'>{rule_caption}</div></div>
   <div class='metric-card'><div class='metric-top'><span class='metric-icon i-entity'>👥</span><div class='metric-label'>Entity Match</div></div><div class='metric-v3'>{entity.get('score',0)}%</div><div class='metric-caption'>{entity.get('level','High')}</div></div>
@@ -673,7 +686,7 @@ with left:
                 <div class="assessment-title">Assessment Summary</div>
               </div>
               <div class="assessment-summary">{html.escape(assessment.get('overall_summary', risk.get('summary', '')))}</div>
-              <div style='font-size:12px;color:#5f7798;margin:6px 0 14px 0;line-height:1.45;'>Coverage Notes: {html.escape(str(coverage_notes))}</div>
+              <div class="coverage-notes">Coverage Notes: {html.escape(str(coverage_notes))}</div>
 
               <div class="assessment-columns">
                 <div>
@@ -727,8 +740,10 @@ with left:
             f"""
             <div class='kf-shell'>
               <div class='kf-head'>
-                <span class='kf-head-icon'>⌕</span>
-                <div class='kf-head-title'>Key Findings</div>
+                <div class='kf-title-wrap'>
+                  <span class='kf-head-icon'>⌕</span>
+                  <span class='header-standard'>Key Findings</span>
+                </div>
               </div>
               {empty_html}
             </div>
@@ -769,7 +784,7 @@ with left:
                   <div class='ev-head'>
                     <div class='ev-title-wrap'>
                       <span class='ev-icon'>▦</span>
-                      <span class='header-standard ev-title'>Evidence</span>
+                      <span class='header-standard'>Evidence</span>
                     </div>
                     <span class='ev-viewall'>View all</span>
                   </div>
@@ -777,9 +792,9 @@ with left:
                     <table class='ev-table'>
                       <thead>
                         <tr>
-                          <th style='width:13%;'>Evidence ID</th>
-                          <th style='width:13%;'>Source Type</th>
-                          <th style='width:17%;'>Source</th>
+                          <th class='col-w-13'>Evidence ID</th>
+                          <th class='col-w-13'>Source Type</th>
+                          <th class='col-w-17'>Source</th>
                           <th>Title</th>
                         </tr>
                       </thead>
@@ -822,18 +837,20 @@ with left:
                 rf_rows = []
                 for flag in risk_flags:
                     category = str(flag.get("category", "")).replace("_", " ").title()
+                    severity = str(flag.get("severity", ""))
+                    badge_class = _severity_badge_class(severity)
                     rf_rows.append(
                         "<tr>"
                         f"<td class='rf-strong'>{html.escape(str(flag.get('flag_id', '')))}</td>"
                         f"<td>{html.escape(category)}</td>"
-                        f"<td><span class='rf-badge rf-badge-high'><span>●</span>{html.escape(str(flag.get('severity', '')).title())}</span></td>"
+                        f"<td><span class='{badge_class}'><span>●</span>{html.escape(severity.title())}</span></td>"
                         f"<td><span class='rf-badge rf-badge-status'>{html.escape(str(flag.get('status', '')).replace('_', '-'))}</span></td>"
                         f"<td>{html.escape(str(flag.get('title', '')))}</td>"
                         "</tr>"
                     )
 
                 if not rf_rows:
-                    rf_rows = ["<tr><td colspan='5' style='text-align:center;color:#7f8b9b;'>No risk flags were generated.</td></tr>"]
+                    rf_rows = [_table_empty_row(5, "No risk flags were generated.")]
 
                 st.markdown(
                     f"""
@@ -849,10 +866,10 @@ with left:
                             <table class='rf-table'>
                                 <thead>
                                     <tr>
-                                        <th style='width:10%;'>Flag ID</th>
-                                        <th style='width:14%;'>Category</th>
-                                        <th style='width:10%;'>Severity</th>
-                                        <th style='width:12%;'>Status</th>
+                                        <th>Flag ID</th>
+                                        <th>Category</th>
+                                        <th>Severity</th>
+                                        <th>Status</th>
                                         <th>Title</th>
                                     </tr>
                                 </thead>
@@ -926,7 +943,7 @@ with left:
                         )
 
                 if not scale_rows:
-                        scale_rows = ["<tr><td colspan='2' style='text-align:center;color:#7f8b9b;'>No component scales defined.</td></tr>"]
+                        scale_rows = [_table_empty_row(2, "No component scales defined.")]
 
                 support_items = "".join(
                         [f"<li>{html.escape(str(item))}</li>" for item in rubric_definition.get("support_band_rules", [])]
@@ -943,12 +960,12 @@ with left:
 </div>
 <div class='rub-version'>Rubric Version: {html.escape(str(rubric_definition.get('rubric_version', 'N/A')))}</div>
 
-<div class='rub-subtitle'>Component Scales</div>
+<div class='section-title'>Component Scales</div>
 <div class='rub-table-wrap'>
 <table class='rub-table'>
 <thead>
 <tr>
-<th style='width:46%;'>Component</th>
+<th class='col-w-46'>Component</th>
 <th>Values</th>
 </tr>
 </thead>
@@ -973,7 +990,19 @@ with left:
                 )
 
     with t5:
-        st.markdown("### Analyst Checklist")
+        st.markdown(
+            """
+            <div class="checklist-shell">
+              <div class="kf-head">
+                <div class="kf-title-wrap">
+                  <span class="kf-head-icon">✓</span>
+                  <span class="header-standard">Analyst Checklist</span>
+                </div>
+              </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
         checklist_items = analyst_checklist if isinstance(analyst_checklist, list) else []
         checklist_signature = tuple(
             f"{item.get('item_id', '')}:{item.get('status', '')}" for item in checklist_items
@@ -1037,20 +1066,20 @@ with left:
                                 f"<tr><td>{html.escape(str(k))}</td><td>{html.escape(_audit_value(v))}</td></tr>"
                         )
                 if not audit_rows:
-                        audit_rows = ["<tr><td colspan='2' style='text-align:center;color:#7f8b9b;'>No audit data.</td></tr>"]
+                        audit_rows = [_table_empty_row(2, "No audit data.")]
 
                 st.markdown(
                         f"""
                         <div class='aud-shell'>
                             <div class='aud-head'>
                                 <span class='aud-icon'>◷</span>
-                                <span class='header-standard' style='font-size:20px;'>Audit Trail</span>
+                                <span class='header-standard'>Audit Trail</span>
                             </div>
                             <div class='aud-table-wrap'>
                                 <table class='aud-table'>
                                     <thead>
                                         <tr>
-                                            <th style='width:44%;'>Field</th>
+                                            <th class='col-w-44'>Field</th>
                                             <th>Value</th>
                                         </tr>
                                     </thead>
@@ -1068,14 +1097,14 @@ with left:
                 full_subject = schema_subject.get("primary_name") or subject.get("name", "-")
                 full_disposition = _format_disposition(assessment.get("recommended_disposition") or risk.get("recommendation", ""))
                 full_summary = assessment.get("overall_summary") or ""
-                full_rationale = assessment.get("disposition_rationale") or determination.get("rationale") or ""
+                full_rationale = assessment.get("disposition_rationale") or determination.get("disposition_rationale") or ""
 
                 st.markdown(
                         f"""
                         <div class='fm-shell'>
                             <div class='fm-head'>
                                 <span class='fm-icon'>📄</span>
-                                <span class='fm-title'>Full Memo</span>
+                                <span class='header-standard'>Full Memo</span>
                             </div>
                             <div class='fm-subject'>
                                 <b>Subject:</b> <span class='fm-subject-value'>{html.escape(str(full_subject))}</span>
@@ -1101,14 +1130,14 @@ with right:
 
     st.markdown(
         f"""
-<div class='panel' style='margin-bottom:10px;'>
-  <div style='display:flex;align-items:center;gap:10px;margin-bottom:12px;'>
-    <div style='width:36px;height:36px;border-radius:10px;background:#e8f1ff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;'>📋</div>
+<div class='panel panel--stacked'>
+  <div class='panel-head-row'>
+    <div class='panel-icon-lg'>📋</div>
     <div class='header-standard memo-preview-title'>Memo Preview</div>
   </div>
-  <div style='font-size:13px;margin-bottom:8px;'><b>Subject:</b> {html.escape(subject_name_display)}</div>
-  <div style='font-size:13px;color:#444;line-height:1.55;margin-bottom:10px;'>{memo_snippet}</div>
-  <div style='font-size:13px;margin-bottom:14px;'><b>Disposition:</b> <span style='color:#0f9d8d;font-weight:700;'>{html.escape(disposition_display)}</span><br><span style='font-size:12px;color:#5f7798;'>{html.escape(disposition_rationale[:120]) if disposition_rationale else ''}</span></div>
+  <div class='memo-preview-subject'><b>Subject:</b> {html.escape(subject_name_display)}</div>
+  <div class='memo-preview-body'>{memo_snippet}</div>
+  <div class='memo-preview-disposition'><b>Disposition:</b> <span class='disposition-accent'>{html.escape(disposition_display)}</span><br><span class='disposition-rationale'>{html.escape(disposition_rationale[:120]) if disposition_rationale else ''}</span></div>
 </div>
 """,
         unsafe_allow_html=True,
@@ -1165,15 +1194,15 @@ with right:
 
     with st.container(border=True):
         st.markdown(
-            """<div style='display:flex;align-items:center;gap:10px;margin-bottom:10px;'>
-  <div style='width:36px;height:36px;border-radius:10px;background:#e8f1ff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;'>👤</div>
-    <div class='header-standard reviewer-decision-title'>Reviewer Decision</div>
+            """<div class='panel-head-row'>
+  <div class='panel-icon-lg'>👤</div>
+  <div class='header-standard reviewer-decision-title'>Reviewer Decision</div>
 </div>""",
             unsafe_allow_html=True,
         )
         dcol1, dcol2 = st.columns([0.30, 0.70])
         with dcol1:
-            st.markdown("<div style='font-size:13px;font-weight:600;color:#1e3560;padding-top:9px;'>Decision</div>", unsafe_allow_html=True)
+            st.markdown('<div class="reviewer-label reviewer-label--inline">Decision</div>', unsafe_allow_html=True)
         with dcol2:
             st.selectbox(
                 "Decision",
@@ -1181,11 +1210,11 @@ with right:
                 label_visibility="collapsed",
             )
 
-        st.markdown("<div style='font-size:13px;font-weight:600;color:#1e3560;margin:6px 0 4px 0;'>Reviewer Notes</div>", unsafe_allow_html=True)
+        st.markdown('<div class="reviewer-label reviewer-label--block">Reviewer Notes</div>', unsafe_allow_html=True)
         st.text_area("Reviewer Notes", placeholder="Add reviewer notes...", label_visibility="collapsed", height=96)
         st.button("Submit Decision", use_container_width=True)
 
 st.markdown(
-    "<div style='margin-top:8px;font-size:11px;color:#0f6d53;background:#e8f9f3;border:1px solid #9edbc6;border-radius:8px;padding:7px 10px;display:inline-block;'><b>Disclaimer:</b> AI-assisted public-source screening only. Human compliance review required.</div>",
+    "<div class='disclaimer-bar'><b>Disclaimer:</b> AI-assisted public-source screening only. Human compliance review required.</div>",
     unsafe_allow_html=True,
 )

@@ -2,14 +2,14 @@
 .ev-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .ev-title-wrap { display: flex; align-items: center; gap: 8px; }
 .ev-icon { width: 22px; height: 22px; border-radius: 7px; background: linear-gradient(160deg,#56cf9b,#2da879); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
-.ev-title { font-size: 30px; }
 .ev-viewall { border: 1px solid #e5eaf2; border-radius: 8px; background: #f8fafc; color: #8a96a7; font-size: 10px; font-weight: 600; padding: 4px 8px; }
 .ev-table-wrap { border: 1px solid #e7edf7; border-radius: 8px; overflow: hidden; }
 .ev-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .ev-table th { text-align: left; font-size: 12px; font-weight: 500; color: #7f8b9b; background: #f7f9fc; padding: 8px 10px; border-right: 1px solid #e7edf7; }
 .ev-table th:last-child { border-right: none; }
 .ev-table td { font-size: 13px; color: #2a3a54; padding: 8px 10px; border-top: 1px solid #e7edf7; border-right: 1px solid #e7edf7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ev-table td:last-child { border-right: none; }
+.ev-table th.col-w-13 { width: 13%; }
+.ev-table th.col-w-17 { width: 17%; }
 .ev-subrows { border: 1px solid #e7edf7; border-top: none; border-radius: 0 0 8px 8px; }
 .ev-subrow { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-top: 1px solid #edf2fb; font-size: 13px; color: #2a3a54; }
 .ev-subrow:first-child { border-top: none; }
@@ -34,6 +34,8 @@
 .rf-strong { font-weight: 700; }
 .rf-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; white-space: nowrap; }
 .rf-badge-high { background: #ffeceb; color: #e23a33; }
+.rf-badge-medium { background: #fff3dc; color: #c27d1d; }
+.rf-badge-low { background: #e8f9f3; color: #129069; }
 .rf-badge-status { background: #fff3dc; color: #c27d1d; }
 .rbd-shell { margin-top: 14px; border: 1px solid #dce6f7; border-radius: 12px; background: #ffffff; padding: 10px; }
 .rbd-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
@@ -62,10 +64,10 @@
 .aud-table th:last-child { border-right: none; }
 .aud-table td { font-size: 12px; color: #2a3a54; padding: 8px 10px; border-top: 1px solid #e7edf7; border-right: 1px solid #e7edf7; vertical-align: top; word-break: break-word; }
 .aud-table td:last-child { border-right: none; }
+.aud-table th.col-w-44 { width: 44%; }
 .fm-shell { margin-top: 6px; border: 1px solid #dce6f7; border-radius: 12px; background: #ffffff; padding: 10px; max-width: 560px; }
 .fm-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .fm-icon { width: 22px; height: 22px; border-radius: 7px; background: linear-gradient(160deg,#66a9ff,#2f76df); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
-.fm-title { font-family: 'Space Grotesk', sans-serif !important; font-size: 30px; font-weight: 700; color: #1a2f5e; line-height: 1.2; }
 .fm-subject { border: 1px solid #d7e2f7; border-radius: 8px; background: #f5f8ff; padding: 10px 12px; font-size: 12px; color: #2a3a54; margin-bottom: 10px; }
 .fm-subject-value { color: #2f6fed; }
 .fm-body { font-size: 13px; color: #2a3a54; line-height: 1.6; margin-bottom: 10px; }
@@ -76,7 +78,7 @@
 .rub-head { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
 .rub-icon { width: 22px; height: 22px; border-radius: 7px; background: linear-gradient(160deg,#8b79ff,#6f57db); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
 .rub-version { font-size: 12px; color: #5f7290; margin: 2px 0 10px 30px; }
-.rub-subtitle { font-family: 'Space Grotesk', sans-serif !important; font-size: 20px; font-weight: 700; color: #1a2f5e; margin: 8px 0 8px 0; }
+.rub-table th.col-w-46 { width: 46%; }
 .rub-table-wrap { border: 1px solid #e7edf7; border-radius: 8px; overflow: hidden; }
 .rub-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .rub-table th { text-align: left; font-size: 12px; font-weight: 500; color: #7f8b9b; background: #f7f9fc; padding: 8px 10px; border-right: 1px solid #e7edf7; }
