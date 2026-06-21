@@ -44,6 +44,54 @@ def _normalize_analysis(payload: dict) -> dict:
             }
             for idx, item in enumerate(findings)
         ]
+    elif isinstance(findings, list):
+        normalized_findings = []
+        for idx, item in enumerate(findings):
+            if isinstance(item, str):
+                text = item.strip()
+                normalized_findings.append(
+                    {
+                        "title": f"Finding {idx + 1}",
+                        "category": "Adverse Media",
+                        "severity": "Moderate",
+                        "confidence": 70,
+                        "description": text or "Requires analyst review.",
+                    }
+                )
+                continue
+
+            if isinstance(item, dict):
+                title = str(item.get("title") or "").strip()
+                category = str(item.get("category") or "").strip()
+                severity = str(item.get("severity") or "").strip()
+                confidence = item.get("confidence")
+                description = str(item.get("description") or "").strip()
+
+                if not title and description:
+                    title = description[:96]
+                if not title:
+                    title = f"Finding {idx + 1}"
+                if not category:
+                    category = "Adverse Media"
+                if not severity:
+                    severity = "Moderate"
+                if description == "":
+                    description = "Requires analyst review."
+                if confidence in (None, ""):
+                    confidence = 70
+
+                normalized_findings.append(
+                    {
+                        "title": title,
+                        "category": category,
+                        "severity": severity,
+                        "confidence": confidence,
+                        "description": description,
+                    }
+                )
+
+        if normalized_findings:
+            payload["keyFindings"] = normalized_findings
 
     steps = payload.get("recommendedNextSteps")
     if isinstance(steps, list) and steps and isinstance(steps[0], str):
