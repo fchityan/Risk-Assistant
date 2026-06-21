@@ -16,7 +16,7 @@ from api_client import (
     submit_clarification,
 )
 from report_adapter import load_report_from_path, normalize_ui_data
-from services.bright_data import bright_data_configured, collect_public_data
+from services.bright_data import bright_data_missing_fields, collect_public_data
 from services.llm_reasoning import KIMI_API_KEY, analyze_with_llm
 from services.sensenova import generate_memo
 from settings import get_frontend_settings
@@ -191,8 +191,14 @@ def _resolve_data_source() -> None:
         backend_error = str(exc)
 
     if _frontend_live_configured():
+        missing = bright_data_missing_fields()
+        source_note = (
+            " using fallback public evidence (Bright Data not configured)."
+            if missing
+            else " with Bright Data + Kimi."
+        )
         _set_frontend_live_bypass(
-            f"Backend unavailable ({backend_error}); using frontend live bypass (Bright Data + Kimi)."
+            f"Backend unavailable ({backend_error}); using frontend live bypass{source_note}"
         )
         return
 
@@ -206,7 +212,7 @@ def _fallback_to_mock(reason: str) -> None:
 
 
 def _frontend_live_configured() -> bool:
-    return bool((KIMI_API_KEY or "").strip()) and bright_data_configured()
+    return bool((KIMI_API_KEY or "").strip())
 
 
 def _run_frontend_live_screening(
