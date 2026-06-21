@@ -4,21 +4,32 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 
+import pandas as pd
 import streamlit as st
+
+from api_client import (
+    build_screen_request,
+    generate_sensenova_memo,
+    get_health,
+    get_screen_status,
+    start_screening,
     submit_clarification,
 )
 from report_adapter import load_report_from_path, normalize_ui_data
-from services.bright_data import bright_data_configured, bright_data_missing_fields, collect_public_data
+from services.bright_data import bright_data_configured, collect_public_data
 from services.llm_reasoning import KIMI_API_KEY, analyze_with_llm
-        if _frontend_live_configured():
-            _set_frontend_live_bypass(
-                f"Backend unavailable ({backend_error}); using frontend live bypass (Bright Data + Kimi)."
-            )
-            return
-        _set_mock_mode(
-            f"Could not reach API at {backend_url}; using mock data ({exc}).{missing_live_text}"
-        )
+from services.sensenova import generate_memo
+from settings import get_frontend_settings
+from style_loader import inject_app_styles
 
+st.set_page_config(
+    page_title="Risk Assistant",
+    page_icon="🛡️",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+FRONTEND_DIR = Path(__file__).resolve().parent
 DEFAULT_DATA_PATH = FRONTEND_DIR.parent / "docs" / "examples" / "example-profile.json"
 SETTINGS = get_frontend_settings()
 SUBJECT_TYPES = ["Company", "Private Company", "Individual", "HNW Prospect", "Vendor", "Key Person"]
@@ -75,19 +86,26 @@ def _kv_rows(pairs: list[tuple[str, str]]) -> str:
     return "".join(rows)
 
 
+def _severity_badge_class(severity: str) -> str:
+    level = (severity or "").strip().lower()
+    if level in {"high", "critical"}:
+        return "rf-badge rf-badge-high"
+    if level in {"medium", "moderate"}:
+        return "rf-badge rf-badge-medium"
+    return "rf-badge rf-badge-low"
+
 
 def _table_empty_row(colspan: int, message: str) -> str:
     return f"<tr><td colspan='{colspan}' class='table-empty'>{html.escape(message)}</td></tr>"
 
-        if _frontend_live_configured():
-            _set_frontend_live_bypass(
-                f"Backend unavailable ({backend_error}); using frontend live bypass (Bright Data + Kimi)."
-            )
-            return
-        _set_mock_mode(
-            f"Could not reach API at {backend_url}; using mock data ({exc}).{missing_live_text}"
+
+def _init_state() -> None:
     if "ui_data" not in st.session_state:
         st.session_state.ui_data = load_report_from_path(DEFAULT_DATA_PATH)
+    if "polling" not in st.session_state:
+        st.session_state.polling = False
+    if "active_run_id" not in st.session_state:
+        st.session_state.active_run_id = None
     if "poll_deadline" not in st.session_state:
         st.session_state.poll_deadline = 0.0
     if "last_poll_time" not in st.session_state:
@@ -171,20 +189,6 @@ def _resolve_data_source() -> None:
             return
     except Exception as exc:
         backend_error = str(exc)
-        missing_live = []
-        if not (KIMI_API_KEY or "").strip():
-            missing_live.append("KIMI_API_KEY")
-        missing_live.extend(bright_data_missing_fields())
-        missing_live_text = f" Missing live-mode settings: {', '.join(missing_live)}." if missing_live else ""
-        if _frontend_live_configured():
-            _set_frontend_live_bypass(
-                f"Backend unavailable ({backend_error}); using frontend live bypass (Bright Data + Kimi)."
-            )
-            return
-        _set_mock_mode(
-            f"Could not reach API at {backend_url}; using mock data ({exc}).{missing_live_text}"
-        )
-        return
 
     if _frontend_live_configured():
         _set_frontend_live_bypass(
