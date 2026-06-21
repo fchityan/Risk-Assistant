@@ -1,9 +1,8 @@
-import os
 from urllib.parse import quote_plus
 
 import httpx
 
-from env_shared import load_shared_env
+from env_shared import get_config_value, load_shared_env
 
 load_shared_env()
 
@@ -11,15 +10,24 @@ REQUEST_URL = "https://api.brightdata.com/request"
 
 
 def _api_key() -> str:
-    return (os.getenv("BRIGHT_DATA_API_KEY") or os.getenv("BRIGHTDATA_API_KEY") or "").strip()
+    return (get_config_value("BRIGHT_DATA_API_KEY") or get_config_value("BRIGHTDATA_API_KEY") or "").strip()
 
 
 def _serp_zone() -> str:
-    return (os.getenv("BRIGHT_DATA_SERP_ZONE") or "").strip()
+    return get_config_value("BRIGHT_DATA_SERP_ZONE").strip()
 
 
 def bright_data_configured() -> bool:
     return bool(_api_key()) and bool(_serp_zone())
+
+
+def bright_data_missing_fields() -> list[str]:
+    missing: list[str] = []
+    if not _api_key():
+        missing.append("BRIGHT_DATA_API_KEY")
+    if not _serp_zone():
+        missing.append("BRIGHT_DATA_SERP_ZONE")
+    return missing
 
 
 def _google_search_url(query: str, gl: str = "sg", hl: str = "en", num_results: int = 8) -> str:

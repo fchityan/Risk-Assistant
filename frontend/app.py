@@ -16,7 +16,7 @@ from api_client import (
     submit_clarification,
 )
 from report_adapter import load_report_from_path, normalize_ui_data
-from services.bright_data import bright_data_configured, collect_public_data
+from services.bright_data import bright_data_configured, bright_data_missing_fields, collect_public_data
 from services.llm_reasoning import KIMI_API_KEY, analyze_with_llm
 from services.sensenova import generate_memo
 from settings import get_frontend_settings
@@ -177,8 +177,13 @@ def _resolve_data_source() -> None:
     except Exception as exc:
         st.session_state.effective_use_mock_data = True
         st.session_state.backend_available = False
+        missing_live = []
+        if not (KIMI_API_KEY or "").strip():
+            missing_live.append("KIMI_API_KEY")
+        missing_live.extend(bright_data_missing_fields())
+        missing_live_text = f" Missing live-mode settings: {', '.join(missing_live)}." if missing_live else ""
         st.session_state.backend_status_message = (
-            f"Could not reach API at {backend_url}; using mock data ({exc})."
+            f"Could not reach API at {backend_url}; using mock data ({exc}).{missing_live_text}"
         )
 
 

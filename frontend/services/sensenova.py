@@ -1,9 +1,8 @@
-import os
-from env_shared import load_shared_env
+from env_shared import get_config_value, load_shared_env
 
 load_shared_env()
 
-SENSENOVA_API_KEY = os.getenv("SENSENOVA_API_KEY")
+SENSENOVA_API_KEY = get_config_value("SENSENOVA_API_KEY")
 
 
 def generate_memo(subject, analysis):

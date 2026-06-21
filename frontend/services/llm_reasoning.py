@@ -1,15 +1,14 @@
-import os
 import json
 import re
 from openai import OpenAI
 
-from env_shared import load_shared_env
+from env_shared import get_config_value, load_shared_env
 
 load_shared_env()
 
-KIMI_API_KEY = os.getenv("KIMI_API_KEY")
-KIMI_BASE_URL = os.getenv("KIMI_BASE_URL", "https://api.moonshot.ai/v1")
-KIMI_MODEL = os.getenv("KIMI_MODEL", "moonshot-v1-auto")
+KIMI_API_KEY = get_config_value("KIMI_API_KEY")
+KIMI_BASE_URL = get_config_value("KIMI_BASE_URL", "https://api.moonshot.ai/v1")
+KIMI_MODEL = get_config_value("KIMI_MODEL", "moonshot-v1-auto")
 
 client = OpenAI(api_key=KIMI_API_KEY, base_url=KIMI_BASE_URL) if KIMI_API_KEY else None
 
