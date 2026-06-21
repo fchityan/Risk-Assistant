@@ -473,7 +473,7 @@ if st.session_state.effective_use_mock_data:
     st.markdown('<div class="mock-banner">Mock mode active. Run reloads local sample report.</div>', unsafe_allow_html=True)
     if st.session_state.backend_status_message:
         st.caption(st.session_state.backend_status_message)
-elif st.session_state.backend_status_message:
+elif st.session_state.backend_status_message and not st.session_state.frontend_live_mode:
     st.caption(st.session_state.backend_status_message)
 
 hero_left, hero_right = st.columns([4.2, 1.0])
