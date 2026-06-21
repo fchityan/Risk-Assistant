@@ -1,4 +1,8 @@
-# Risk Assistant
+## Risk Assistant - Agent Forge Hackathon Top 10 Finalist
+
+This repository documents the final collaborative hackathon prototype built during Agent Forge Hackathon. The project was selected as one of the Top 10 finalist teams out of 55 teams.
+
+This repo is kept as a portfolio archive of the collaborative project.
 
 Risk Assistant is an AI-assisted public-source reputational screening system for organizations and individuals. It combines evidence collection, rubric-based risk scoring, and reviewer-ready output to support compliance and onboarding workflows.
 
