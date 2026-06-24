@@ -730,16 +730,18 @@ with left:
                     "confidence": finding.get("confidence", ""),
                 }
             )
-        for flag in risk_flags:
-            finding_items.append(
-                {
-                    "title": flag.get("title") or flag.get("description") or "Risk Flag",
-                    "severity": str(flag.get("severity", "medium")).title(),
-                    "category": flag.get("category", ""),
-                    "description": flag.get("description", ""),
-                    "confidence": "",
-                }
-            )
+        if not finding_items:
+            # Fallback for inputs that provide only risk flags and no normalized key findings.
+            for flag in risk_flags:
+                finding_items.append(
+                    {
+                        "title": flag.get("title") or flag.get("description") or "Risk Flag",
+                        "severity": str(flag.get("severity", "medium")).title(),
+                        "category": flag.get("category", ""),
+                        "description": flag.get("description", ""),
+                        "confidence": flag.get("confidence", 70),
+                    }
+                )
 
         empty_html = "<div class='kf-empty'>No key findings available.</div>" if not finding_items else ""
         st.markdown(
@@ -770,6 +772,17 @@ with left:
                     st.markdown(str(item["description"]))
 
     with t2:
+        if st.session_state.effective_use_mock_data:
+            st.warning(
+                "Showing sample evidence from docs/examples/example-profile.json because live backend data is unavailable."
+            )
+        elif st.session_state.get("frontend_live_mode"):
+            st.info("Showing frontend live bypass evidence (Bright Data + Kimi via Streamlit).")
+        else:
+            sources = report_metadata.get("data_sources", [])
+            if sources:
+                st.caption(f"Evidence source: {', '.join(str(s) for s in sources)}")
+
         ev_df = pd.DataFrame(evidence_raw)
         if ev_df.empty:
             st.info("No evidence items found.")
