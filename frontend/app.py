@@ -35,6 +35,52 @@ SETTINGS = get_frontend_settings()
 SUBJECT_TYPES = ["Company", "Private Company", "Individual", "HNW Prospect", "Vendor", "Key Person"]
 
 
+def _blank_ui_data() -> dict:
+    """Return an empty-but-valid UI model for live mode before a successful run."""
+    ui = load_report_from_path(DEFAULT_DATA_PATH)
+    ui["subject"] = {
+        "name": "",
+        "type": "organization",
+        "country": "",
+        "screeningPurpose": "",
+        "role": "",
+    }
+    ui["riskSummary"] = {
+        "riskCategory": "Not Available",
+        "confidenceScore": 0,
+        "recommendation": "Run Screening",
+        "summary": "No live screening data loaded yet.",
+        "supportSummaryLine": "0 high / 0 med / 0 low",
+        "confidenceLabel": "Low",
+    }
+    ui["entityMatch"] = {
+        "score": 0,
+        "level": "Unknown",
+        "rationale": "No live screening data loaded yet.",
+    }
+    ui["memo"] = {
+        "body": "No memo available. Start a screening run to generate a report.",
+        "disclaimer": "AI-assisted public-source screening only. Human compliance review required.",
+    }
+    ui["evidenceTable"] = []
+    ui["keyFindings"] = []
+    ui["recommendedNextSteps"] = []
+    ui["riskFlags"] = []
+    ui["evidenceRaw"] = []
+    ui["assessment"] = {}
+    ui["assessmentRaw"] = {}
+    ui["auditTrail"] = {}
+    ui["auditTrailRaw"] = {}
+    ui["reportMetadata"] = {}
+    return ui
+
+
+def _sample_or_blank_ui_data() -> dict:
+    if SETTINGS["use_mock_data"]:
+        return load_report_from_path(DEFAULT_DATA_PATH)
+    return _blank_ui_data()
+
+
 def _api_to_ui_subject_type(value: str) -> str:
     return "Individual" if (value or "").lower() == "individual" else "Company"
 
@@ -101,7 +147,7 @@ def _table_empty_row(colspan: int, message: str) -> str:
 
 def _init_state() -> None:
     if "ui_data" not in st.session_state:
-        st.session_state.ui_data = load_report_from_path(DEFAULT_DATA_PATH)
+        st.session_state.ui_data = _sample_or_blank_ui_data()
     if "polling" not in st.session_state:
         st.session_state.polling = False
     if "active_run_id" not in st.session_state:
@@ -437,7 +483,7 @@ st.sidebar.markdown(
         "live mode"
         if st.session_state.get("frontend_live_mode")
         else
-        "mock data (API unavailable)"
+        "api unavailable"
         if st.session_state.effective_use_mock_data and not SETTINGS["use_mock_data"]
         else "mock data"
         if st.session_state.effective_use_mock_data
@@ -470,7 +516,12 @@ Evidence -> Rules -> Memo
 )
 
 if st.session_state.effective_use_mock_data:
-    st.markdown('<div class="mock-banner">Mock mode active. Run reloads local sample report.</div>', unsafe_allow_html=True)
+    banner = (
+        "Mock mode active. Run reloads local sample report."
+        if SETTINGS["use_mock_data"]
+        else "Live backend unavailable. Showing empty state instead of sample evidence."
+    )
+    st.markdown(f"<div class=\"mock-banner\">{banner}</div>", unsafe_allow_html=True)
     if st.session_state.backend_status_message:
         st.caption(st.session_state.backend_status_message)
 elif st.session_state.backend_status_message and not st.session_state.frontend_live_mode:
@@ -550,13 +601,13 @@ if run:
                         st.rerun()
                     except Exception as live_exc:
                         _fallback_to_mock(str(live_exc))
-                        st.session_state.ui_data = load_report_from_path(DEFAULT_DATA_PATH)
-                        st.session_state.last_success = "Backend and frontend live bypass failed. Loaded example profile."
+                        st.session_state.ui_data = _sample_or_blank_ui_data()
+                        st.session_state.last_success = "Backend and frontend live bypass failed."
                         st.rerun()
                 else:
                     _fallback_to_mock(str(exc))
-                    st.session_state.ui_data = load_report_from_path(DEFAULT_DATA_PATH)
-                    st.session_state.last_success = "Backend unavailable. Loaded example profile."
+                    st.session_state.ui_data = _sample_or_blank_ui_data()
+                    st.session_state.last_success = "Backend unavailable."
                     st.rerun()
     elif st.session_state.frontend_live_mode or _frontend_live_configured():
         try:
@@ -573,19 +624,19 @@ if run:
             st.rerun()
         except Exception as exc:
             _fallback_to_mock(str(exc))
-            st.session_state.ui_data = load_report_from_path(DEFAULT_DATA_PATH)
-            st.session_state.last_success = "Frontend live bypass failed. Loaded example profile."
+            st.session_state.ui_data = _sample_or_blank_ui_data()
+            st.session_state.last_success = "Frontend live bypass failed."
             st.rerun()
     elif st.session_state.effective_use_mock_data:
-        st.session_state.ui_data = load_report_from_path(DEFAULT_DATA_PATH)
-        st.session_state.last_success = "Loaded example profile."
+        st.session_state.ui_data = _sample_or_blank_ui_data()
+        st.session_state.last_success = "Loaded current data source."
         st.rerun()
     elif not subject_name.strip():
         st.error("Subject name is required.")
     else:
         _fallback_to_mock("No backend or live bypass path available.")
-        st.session_state.ui_data = load_report_from_path(DEFAULT_DATA_PATH)
-        st.session_state.last_success = "Loaded example profile."
+        st.session_state.ui_data = _sample_or_blank_ui_data()
+        st.session_state.last_success = "No live data source available."
         st.rerun()
 
 if st.session_state.get("clarification_pending"):
