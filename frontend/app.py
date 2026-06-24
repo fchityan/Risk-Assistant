@@ -268,7 +268,7 @@ def _run_frontend_live_screening(
     purpose: str,
     role: str,
 ) -> dict:
-    ui = load_report_from_path(DEFAULT_DATA_PATH)
+    ui = _blank_ui_data()
 
     subject_payload = {
         "name": subject_name,
@@ -312,10 +312,12 @@ def _run_frontend_live_screening(
     ui["entityMatch"]["rationale"] = "Live mode entity estimate from public-source evidence."
 
     evidence_rows = []
+    evidence_raw = []
     for idx, src in enumerate(public_sources, start=1):
+        ev_id = f"EV-{idx:03d}"
         evidence_rows.append(
             {
-                "id": f"EV-{idx:03d}",
+                "id": ev_id,
                 "sourceName": src.get("sourceName", "Public source"),
                 "sourceUrl": src.get("sourceUrl", ""),
                 "sourceTier": "Open Web",
@@ -335,7 +337,22 @@ def _run_frontend_live_screening(
             }
         )
 
+        evidence_raw.append(
+            {
+                "evidence_id": ev_id,
+                "source_type": "news",
+                "source_name": src.get("sourceName", "Public source"),
+                "title": src.get("sourceName", "Public signal"),
+                "url": src.get("sourceUrl", ""),
+                "publication_date": None,
+                "snippet": src.get("sourceSnippet", ""),
+                "risk_categories": ["adverse_media"],
+            }
+        )
+
     ui["evidenceTable"] = evidence_rows
+    ui["evidenceRaw"] = evidence_raw
+    ui["evidence"] = evidence_raw
     ui["keyFindings"] = findings or ui.get("keyFindings", [])
     ui["recommendedNextSteps"] = steps or ui.get("recommendedNextSteps", [])
     ui["memo"]["body"] = memo_payload.get("body") or risk.get("summary") or ui["memo"].get("body", "")

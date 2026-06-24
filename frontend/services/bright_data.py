@@ -45,28 +45,9 @@ def _parse_results(payload: dict | list) -> list[dict]:
 
 
 def collect_public_data(subject_name: str, country: str):
-    """Collect public web evidence using Bright Data SERP API with mock fallback."""
+    """Collect public web evidence using Bright Data SERP API."""
     if not bright_data_configured():
-        return [
-            {
-                "sourceType": "Company Website",
-                "sourceName": "Mock company website",
-                "sourceUrl": "https://example.com/company",
-                "sourceSnippet": f"{subject_name} appears as a company operating in {country}."
-            },
-            {
-                "sourceType": "Public Review Page",
-                "sourceName": "Mock review page",
-                "sourceUrl": "https://example.com/reviews",
-                "sourceSnippet": "Several public reviews mention delayed responses and communication issues."
-            },
-            {
-                "sourceType": "Public Web Search",
-                "sourceName": "Mock public search result",
-                "sourceUrl": "https://example.com/search",
-                "sourceSnippet": "A similarly named entity appears in another jurisdiction."
-            }
-        ]
+        return []
 
     query_parts = [f'"{subject_name}"']
     if country:
@@ -112,11 +93,4 @@ def collect_public_data(subject_name: str, country: str):
             )
         return items
     except Exception:
-        return [
-            {
-                "sourceType": "Public Web Search",
-                "sourceName": "Bright Data fallback",
-                "sourceUrl": "https://brightdata.com",
-                "sourceSnippet": "Live Bright Data query failed. Showing fallback evidence for continuity.",
-            }
-        ]
+        return []
