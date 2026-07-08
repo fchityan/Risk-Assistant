@@ -1,4 +1,4 @@
-## Risk Assistant - Agent Forge Hackathon Top 10 Finalist
+## Risk Assistant
 
 This repository documents the final collaborative hackathon prototype built during Agent Forge Hackathon. The project was selected as one of the Top 10 finalist teams out of 55 teams.
 
