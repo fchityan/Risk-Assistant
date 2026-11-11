@@ -31,7 +31,11 @@ The project was selected as a **Top 10 finalist from 55 teams** at Agent Forge H
 
 ## Technology Stack
 
-**Python · FastAPI · Streamlit · Rule-Based Scoring · Public-Source Research**
+- **Language and interface:** Python, Streamlit, pandas, custom CSS
+- **Backend and data contracts:** FastAPI, Uvicorn, Pydantic, pydantic-settings, HTTPX, python-dotenv, JSON Schema validation (`jsonschema`)
+- **Research and browser access:** Bright Data SERP and Browser APIs, Playwright/Chromium
+- **AI/LLM integration:** OpenAI-compatible Python SDK with configurable TokenRouter, OpenRouter, or Kimi; SenseNova with Kimi fallback for memos
+- **Workflow and decision logic:** Daytona SDK sandbox integration, structured evidence processing, deterministic rule-based scoring
 
 ## Explore the Project
 
