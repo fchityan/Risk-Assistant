@@ -1,4 +1,4 @@
-# AI-Assisted Compliance Risk Screening
+# Risk Assistant
 
 <!-- portfolio-summary:start -->
 ## Portfolio Snapshot
