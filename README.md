@@ -5,30 +5,38 @@
 
 **Problem:** Public-source reputational screening can be slow, inconsistent, and difficult to audit.
 
-**Method:** Built a FastAPI + Streamlit workflow that gathers public-source evidence, resolves subject ambiguity, classifies evidence against a fixed rubric, and computes final risk outcomes with deterministic rules.
+**Method:** Risk Assistant collects public-source evidence, addresses subject ambiguity, classifies findings against a defined rubric, and applies transparent rules to risk outcomes.
 
-**Output:** Reviewer-ready findings, supporting evidence, risk assessment, audit trail, and memo-style reporting for more consistent compliance decisions.
+**Output:** Structured findings with supporting evidence, an audit trail, and reviewer-ready summaries.
 
-**Evidence:** Agent Forge Hackathon 2026 — **Top 10 finalist team out of 55 teams**.
-
-**Portfolio stack:** Python · FastAPI · Streamlit · Rule-Based Scoring · Public-Source Research
-
+**Evidence:** **Top 10 finalist team out of 55 teams** at Agent Forge Hackathon 2026.
 <!-- portfolio-summary:end -->
 
-This repository documents the final collaborative hackathon prototype built during Agent Forge Hackathon. The project was selected as one of the Top 10 finalist teams out of 55 teams.
+## Project Overview
 
-This repo is kept as a portfolio archive of the collaborative project.
+Risk Assistant is an AI-assisted prototype for public-source reputational screening of organizations and individuals. It was developed as a **collaborative hackathon project** to help reviewers organize background information for compliance and onboarding decisions.
 
-Risk Assistant is an AI-assisted public-source reputational screening system for organizations and individuals. It combines evidence collection, rubric-based risk scoring, and reviewer-ready output to support compliance and onboarding workflows.
+## Key Features
 
-The project includes:
+- Collects and organizes relevant public-source findings
+- Supports subject resolution when names are ambiguous
+- Classifies findings using a defined evidence rubric
+- Applies rule-based risk assessments for consistent decisions
+- Produces supporting evidence, audit information, and memo-style reports
+- Provides a web interface for reviewing screening results
 
-- `backend/`: FastAPI pipeline for screening orchestration, classification, rule evaluation, and report generation.
-- `frontend/`: Streamlit interface for running screenings and reviewing findings, evidence, and memo output.
-- `docs/`: architecture, integration notes, schema references, and examples.
+## Outcome and Limitations
 
-For setup and usage details, see:
+The project was selected as a **Top 10 finalist from 55 teams** at Agent Forge Hackathon 2026. This recognition relates to the hackathon submission; it is not a measured detection-accuracy or commercial-deployment result. The prototype is intended to **support human review**, not replace verification or compliance judgment.
 
-- [backend/README.md](backend/README.md)
-- [frontend/README.md](frontend/README.md)
-- [docs/README.md](docs/README.md)
+## Technology Stack
+
+**Python · FastAPI · Streamlit · Rule-Based Scoring · Public-Source Research**
+
+## Explore the Project
+
+- [Backend and screening workflow](backend/README.md)
+- [Frontend and user interface](frontend/README.md)
+- [Architecture and integration documentation](docs/README.md)
+
+This repository is preserved as an archive of the collaborative hackathon prototype.
