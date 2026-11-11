@@ -29,24 +29,6 @@ Risk Assistant is an AI-assisted prototype for public-source reputational screen
 
 The project was selected as a **Top 10 finalist from 55 teams** at Agent Forge Hackathon 2026. This recognition relates to the hackathon submission; it is not a measured detection-accuracy or commercial-deployment result. The prototype is intended to **support human review**, not replace verification or compliance judgment.
 
-## Business Analysis, Digital Transformation & AI Enablement
-
-- **Business analysis:** Map analyst screening requirements, entity-disambiguation decisions and evidence traceability.
-- **Digital transformation:** Document screening intake → source research → evidence review → rubric-based assessment → reviewer-ready reports.
-- **AI enablement:** Distinguish language-model evidence classification from deterministic risk rules, with human oversight.
-
-See the [requirements and solution-design assessment](docs/business-analysis/business-requirements-and-solution-design.md) and [AI readiness / governance assessment](docs/ai-enablement/ai-readiness-and-model-governance-assessment.md). These documents are analysis artefacts, not claims of formal UAT or enterprise deployment.
-
-### Folder guide
-
-| Existing folder | Business or delivery perspective |
-|---|---|
-| `backend/` | API integration, screening orchestration and decision rules |
-| `backend/stages/` | Multi-stage evidence collection and AI-enabled workflow |
-| `frontend/` | User experience and analyst review interface |
-| `frontend/services/` | External-source and AI service integrations |
-| `docs/` | Requirements, architecture, report schemas and governance |
-
 ## Technology Stack
 
 - **Language and interface:** Python, Streamlit, pandas, custom CSS
