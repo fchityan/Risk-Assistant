@@ -1,4 +1,4 @@
-# Backend Architecture: Reputation Screening Agent
+# Solution Architecture & Process Flows — Risk Assistant
 
 ## Executive Summary
 
@@ -6,7 +6,7 @@ This document defines the backend architecture for the public-source reputationa
 
 The backend runs six sequential stages: subject preparation, **entity resolution (Stage 1.5)**, web data collection, sandbox processing, LLM reasoning, and rule-based assessment. Each stage is isolated, idempotent, and produces a checkpoint, so the pipeline can resume or be replayed from any step — including pausing for analyst clarification when entity identity is ambiguous. The model is responsible only for classification against a fixed rubric; all final risk bands and disposition decisions are computed deterministically in code.[1][2]
 
-Report output conforms to [`schemas/reputation-screening-report-rubric.schema.v1.json`](schemas/reputation-screening-report-rubric.schema.v1.json). See [`examples/example-profile.json`](examples/example-profile.json) for a trimmed sample.
+Report output conforms to[`schemas/reputation-screening-report-rubric.schema.v1.json` ](../schemas/reputation-screening-report-rubric.schema.v1.json). See[`examples/example-profile.json` ](../examples/example-profile.json) for a trimmed sample.
 
 ***
 
@@ -78,7 +78,7 @@ Vary queries across `site:` constraints if relevant (e.g., `site:reuters.com`, `
   "stage": "subject_prep",
   "status": "complete",
   "subject": { ... },
-  "search_queries": ["...", "..."],
+  "search_queries":["...", "..."],
   "timestamp": "2026-06-13T12:30:00Z"
 }
 ```
@@ -122,10 +122,10 @@ Vary queries across `site:` constraints if relevant (e.g., `site:reuters.com`, `
   "resolved_subject": { "user_provided": {}, "inferred": {}, "confirmed": {} },
   "entity_resolution": {
     "ambiguity_level": "high",
-    "reason_codes": ["MULTIPLE_PLAUSIBLE_ORGS"],
+    "reason_codes":["MULTIPLE_PLAUSIBLE_ORGS"],
     "action": "clarification_required"
   },
-  "clarification_form": { "questions": [], "candidate_entities": [] }
+  "clarification_form": { "questions":[], "candidate_entities":[] }
 }
 ```
 
@@ -185,7 +185,7 @@ SERP results across multiple queries will overlap. Deduplicate by URL before fet
   "run_id": "...",
   "stage": "data_collection",
   "status": "complete",
-  "raw_items": [
+  "raw_items":[
     {
       "url": "...",
       "title": "...",
@@ -264,7 +264,7 @@ def process_in_sandbox(raw_items: list[dict], subject: dict) -> list[dict]:
   "run_id": "...",
   "stage": "sandbox_processing",
   "status": "complete",
-  "processed_items": [
+  "processed_items":[
     {
       "item_id": "EV-001",
       "url": "...",
@@ -273,7 +273,7 @@ def process_in_sandbox(raw_items: list[dict], subject: dict) -> list[dict]:
       "source_tier": "tier_1 | tier_2 | tier_3",
       "relevant_excerpt": "...",
       "is_adverse": true,
-      "adverse_keywords_found": ["investigation", "fraud"],
+      "adverse_keywords_found":["investigation", "fraud"],
       "publication_date": "..."
     }
   ],
@@ -520,12 +520,12 @@ def compute_case_risk(
     material_category_count = len({
         cat
         for item in evidence_items
-        for cat in item.get("risk_categories", [])
+        for cat in item.get("risk_categories",[])
         if cat in MATERIAL_CATEGORIES
         and support_bands.get(item["item_id"]) in ("medium", "high")
     })
 
-    triggered_rules = []
+    triggered_rules =[]
     overall_risk = "low"
     disposition = "no_material_concern"
 
@@ -606,13 +606,13 @@ class ScreenRequest(BaseModel):
     primary_name: str
     country: str | None = None
     industry: str | None = None
-    known_associations: list[str] = []
+    known_associations: list[str] =[]
     input_notes: str | None = None
 
 class ClarificationRequest(BaseModel):
     country: str | None = None
     industry: str | None = None
-    known_associations: list[str] = []
+    known_associations: list[str] =[]
     candidate_id: str | None = None
     notes: str | None = None
 
@@ -751,8 +751,10 @@ backend/
 └── requirements.txt
 
 docs/
-├── architecture.md          # This document
-├── integration.md           # Frontend ↔ backend guide
+├── solution-design/
+│   ├── solution-architecture-and-process-flows.md
+│   ├── system-integration-and-interface-specification.md
+│   └── ui-ux-design-standards.md
 ├── schemas/
 │   └── reputation-screening-report-rubric.schema.v1.json
 └── examples/
@@ -767,7 +769,7 @@ There are three layers to manage: your **local dev machine**, the **Daytona work
 
 ### Layer 1 — Local dev (`.env` file + `pydantic-settings`)
 
-Keep a `.env` file that never gets committed (add it to `.gitignore`). Copy from `.env.example` at the repo root. Settings load from **repository root `.env` first**, then `backend/.env` overrides — both backend and frontend use this shared file via `backend/config.py` and `frontend/env_shared.py`. [fastapi.tiangolo](https://fastapi.tiangolo.com/advanced/settings/)
+Keep a `.env` file that never gets committed (add it to `.gitignore`). Copy from `.env.example` at the repo root. Settings load from **repository root `.env` first**, then `backend/.env` overrides — both backend and frontend use this shared file via `backend/config.py` and `frontend/env_shared.py`.[fastapi.tiangolo](https://fastapi.tiangolo.com/advanced/settings/)
 
 ```bash
 cp .env.example .env   # never commit .env
@@ -808,7 +810,7 @@ See `.env.example` for the full list including OpenRouter overrides and Bright D
 
 ### Layer 2 — Daytona workspace (dev environment secrets)
 
-Use the `daytona env set` CLI to register secrets at the workspace level. These persist across workspace restarts and are injected as environment variables into every container and terminal session — no `.env` file needed in the workspace. [daytona](https://www.daytona.io/dotfiles/using-environmental-variables-in-daytona)
+Use the `daytona env set` CLI to register secrets at the workspace level. These persist across workspace restarts and are injected as environment variables into every container and terminal session — no `.env` file needed in the workspace.[daytona](https://www.daytona.io/dotfiles/using-environmental-variables-in-daytona)
 
 ```bash
 daytona env set BRIGHT_DATA_API_KEY=... DAYTONA_API_KEY=... TOKENROUTER_API_KEY=...
@@ -817,11 +819,11 @@ daytona env set BRIGHT_DATA_API_KEY=... DAYTONA_API_KEY=... TOKENROUTER_API_KEY=
 daytona env list
 ```
 
-This is cleaner than keeping a `.env` file in the workspace because the values are stored by Daytona's server, not on disk in your project directory. [daytona](https://www.daytona.io/dotfiles/using-environmental-variables-in-daytona)
+This is cleaner than keeping a `.env` file in the workspace because the values are stored by Daytona's server, not on disk in your project directory.[daytona](https://www.daytona.io/dotfiles/using-environmental-variables-in-daytona)
 
 ### Layer 3 — Deployed sandbox (injected at process launch)
 
-When you spin up the demo sandbox via the SDK, pass secrets as environment variables directly to `CreateSandboxParams`. This keeps them out of your source files entirely. [developers.openai](https://developers.openai.com/cookbook/examples/agents_sdk/computer_use_with_daytona/computer_use_with_daytona)
+When you spin up the demo sandbox via the SDK, pass secrets as environment variables directly to `CreateSandboxParams`. This keeps them out of your source files entirely.[developers.openai](https://developers.openai.com/cookbook/examples/agents_sdk/computer_use_with_daytona/computer_use_with_daytona)
 
 ```python
 import os
@@ -842,7 +844,7 @@ sandbox = daytona.create(CreateSandboxParams(
 ))
 ```
 
-The secrets come from your local env (set via `daytona env set` in Layer 2), so they are never hardcoded in the codebase. [developers.openai](https://developers.openai.com/cookbook/examples/agents_sdk/computer_use_with_daytona/computer_use_with_daytona)
+The secrets come from your local env (set via `daytona env set` in Layer 2), so they are never hardcoded in the codebase.[developers.openai](https://developers.openai.com/cookbook/examples/agents_sdk/computer_use_with_daytona/computer_use_with_daytona)
 
 ### Summary
 
@@ -859,9 +861,9 @@ After deploying, hit `GET /health` to confirm the sandbox booted with all secret
 
 ## Deploying the FastAPI App in a Daytona Sandbox
 
-Daytona provides built-in preview URLs for any port inside a sandbox — no manual tunneling needed. Any HTTP process listening on ports 1–65535 is reachable via a generated URL in the format `https://{port}-{sandboxId}.{daytonaProxyDomain}`. [daytona](https://www.daytona.io/docs/en/preview/)
+Daytona provides built-in preview URLs for any port inside a sandbox — no manual tunneling needed. Any HTTP process listening on ports 1–65535 is reachable via a generated URL in the format `https://{port}-{sandboxId}.{daytonaProxyDomain}`.[daytona](https://www.daytona.io/docs/en/preview/)
 
-**Setting `public: true`** on the sandbox makes that preview URL accessible to your teammate's frontend without any auth header. [daytona](https://www.daytona.io/docs/en/preview/)
+**Setting `public: true`** on the sandbox makes that preview URL accessible to your teammate's frontend without any auth header.[daytona](https://www.daytona.io/docs/en/preview/)
 
 This is distinct from Stage 3 sandbox processing (short-lived sandboxes for text cleanup). For the hackathon demo, you can run the entire FastAPI backend inside a long-lived public sandbox so the frontend can call it directly.
 
@@ -894,7 +896,7 @@ preview_url = sandbox.get_preview_link(8000)
 print(f"Backend URL: {preview_url}")
 ```
 
-Point the frontend's `BACKEND_URL` at `preview_url`. No CORS proxy, no ngrok, no extra infra. [daytona](https://www.daytona.io/docs/en/preview/)
+Point the frontend's `BACKEND_URL` at `preview_url`. No CORS proxy, no ngrok, no extra infra.[daytona](https://www.daytona.io/docs/en/preview/)
 
 When injecting secrets for the deployed sandbox, combine this pattern with Layer 3 above — pass `env_vars` in `CreateSandboxParams` rather than uploading a `.env` file.
 

@@ -1,23 +1,15 @@
-# Documentation
+# Business Analysis, Solution Design & AI Enablement Documentation
 
-| Document | Description |
-|----------|-------------|
-| [architecture.md](architecture.md) | Pipeline stages, API, secrets, deployment, memo API |
-| [integration.md](integration.md) | Frontend ↔ backend, live bypass fallback, report mapping |
-| [style-guide.md](style-guide.md) | Risk Assistant UI typography, colors, components |
-| [../backend/README.md](../backend/README.md) | API quick start, env vars, demo seeds, logging |
-| [../frontend/README.md](../frontend/README.md) | Streamlit UI setup and modules |
+Risk Assistant is a collaborative reputational-screening prototype. The documents below separate solution design, business requirements, human review, architecture and AI-governance evidence; they do not imply customer approval or regulatory certification.
 
-## Schemas and examples
+| Discipline | Technical artefact |
+|---|---|
+| Business analysis, As-Is / To-Be workflow and requirements traceability | [Business Requirements & Solution Design](business-analysis/business-requirements-and-solution-design.md) |
+| AI readiness, model governance and human oversight | [AI Readiness & Model Governance Assessment](ai-enablement/ai-readiness-and-model-governance-assessment.md) |
+| Solution architecture and process orchestration | [Solution Architecture & Process Flows](solution-design/solution-architecture-and-process-flows.md) |
+| API specifications and system integration | [System Integration & Interface Specification](solution-design/system-integration-and-interface-specification.md) |
+| UI/UX design consistency | [User Interface & Experience Design Standards](solution-design/ui-ux-design-standards.md) |
+| Evidence validation contract | [Screening report JSON Schema](schemas/reputation-screening-report-rubric.schema.v1.json) |
+| Reference sample for reviewer workflows | [Example screening profile](examples/example-profile.json) |
 
-| File | Description |
-|------|-------------|
-| [schemas/reputation-screening-report-rubric.schema.v1.json](schemas/reputation-screening-report-rubric.schema.v1.json) | JSON Schema for v1 screening reports |
-| [examples/example-profile.json](examples/example-profile.json) | Trimmed sample report (assessment + one evidence item) |
-
-Validate a completed run against Pydantic models and JSON Schema:
-
-```bash
-cd backend
-python validate_report.py runs/DEMO-ORION-001/final_report.json
-```
+For operational setup, see [backend](../backend/README.md) and [frontend](../frontend/README.md).

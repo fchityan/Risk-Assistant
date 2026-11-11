@@ -91,7 +91,7 @@ Subject type mapping (UI label → API):
 | `static/base.css` | App shell, sidebar, forms, tabs, responsive layout |
 | `static/panels.css` | Dashboard panel and table styles |
 
-UI conventions (colors, typography, panel patterns): [docs/style-guide.md](../docs/style-guide.md)
+UI conventions (colors, typography, panel patterns): [docs/solution-design/ui-ux-design-standards.md](../docs/solution-design/ui-ux-design-standards.md)
 
 | `api_client.py` | HTTP client for backend endpoints |
 | `env_shared.py` | Loads shared root/backend `.env` |
@@ -106,4 +106,4 @@ UI conventions (colors, typography, panel patterns): [docs/style-guide.md](../do
 - **LLM issues** — verify Kimi settings in `.env` (`KIMI_API_KEY`, `KIMI_BASE_URL`, `KIMI_MODEL`)
 - **Empty dashboard** — confirm `docs/examples/example-profile.json` exists or a run completed successfully
 
-Full stack guide: [docs/integration.md](../docs/integration.md) · Architecture: [docs/architecture.md](../docs/architecture.md)
+Full stack guide: [docs/solution-design/system-integration-and-interface-specification.md](../docs/solution-design/system-integration-and-interface-specification.md) · Architecture: [docs/solution-design/solution-architecture-and-process-flows.md](../docs/solution-design/solution-architecture-and-process-flows.md)

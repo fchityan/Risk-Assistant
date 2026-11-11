@@ -1,4 +1,4 @@
-# Business Requirements & Solution Design — Risk Assistant
+# Business Requirements & Solution Design Specification — Risk Assistant
 
 This is a project-level **business-analysis and solution-design record** for a collaborative hackathon prototype, not a client-approved BRD or completed UAT certification.
 
@@ -26,4 +26,4 @@ These are **proposed BA acceptance checks**; no formal customer UAT is implied.
 
 Real deployment would require documented risk appetite, permitted source use, privacy and retention policies, analyst escalation, source reliability standards, failure fallback and human final-decision authority.
 
-See [AI governance assessment](../ai-enablement/readiness-and-governance.md) and [existing architecture](../architecture.md).
+See [AI governance assessment](../ai-enablement/ai-readiness-and-model-governance-assessment.md) and [existing architecture](../solution-design/solution-architecture-and-process-flows.md).

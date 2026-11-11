@@ -1,4 +1,4 @@
-# Frontend ↔ Backend integration
+# System Integration & Interface Specification — Risk Assistant
 
 This document describes how the Streamlit UI (`frontend/`) connects to the screening API (`backend/`).
 
@@ -108,7 +108,7 @@ Behavior:
 
 ## Report shape
 
-The backend returns a **v1 reputational screening report** (see [`schemas/reputation-screening-report-rubric.schema.v1.json`](schemas/reputation-screening-report-rubric.schema.v1.json)).
+The backend returns a **v1 reputational screening report** (see [`schemas/reputation-screening-report-rubric.schema.v1.json`](../schemas/reputation-screening-report-rubric.schema.v1.json)).
 
 The UI does not consume that schema directly. `frontend/report_adapter.py` maps it to a view model with:
 
@@ -158,7 +158,7 @@ If you embed a browser SPA later, enable CORS on `backend/main.py` (localhost po
 
 ## Related docs
 
-- [backend/README.md](../backend/README.md) — pipeline, env, logging
-- [frontend/README.md](../frontend/README.md) — UI modules
-- [architecture.md](architecture.md) — stage design
-- [README.md](README.md) — documentation index
+- [backend/README.md](../../backend/README.md) — pipeline, env, logging
+- [frontend/README.md](../../frontend/README.md) — UI modules
+- [architecture.md](solution-architecture-and-process-flows.md) — stage design
+- [README.md](../README.md) — documentation index

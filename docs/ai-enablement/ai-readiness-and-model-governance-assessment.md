@@ -1,4 +1,4 @@
-# AI Enablement Readiness & Governance — Risk Assistant
+# AI Readiness & Model Governance Assessment — Risk Assistant
 
 ## AI and decision architecture
 
@@ -21,4 +21,4 @@ Risk Assistant is a collaborative prototype using public-source research, entity
 
 The **Top 10 finalist ranking among 55 teams** reflects hackathon recognition, not independently validated screening accuracy, regulatory approval or enterprise-production adoption. Before rollout, define a controlled evaluation set and an analyst UAT protocol.
 
-See [requirements and solution design](../business-analysis/requirements-and-solution-design.md).
+See [requirements and solution design](../business-analysis/business-requirements-and-solution-design.md).

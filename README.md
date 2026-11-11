@@ -35,7 +35,7 @@ The project was selected as a **Top 10 finalist from 55 teams** at Agent Forge H
 - **Digital transformation:** Document screening intake → source research → evidence review → rubric-based assessment → reviewer-ready reports.
 - **AI enablement:** Distinguish language-model evidence classification from deterministic risk rules, with human oversight.
 
-See the [requirements and solution-design assessment](docs/business-analysis/requirements-and-solution-design.md) and [AI readiness / governance assessment](docs/ai-enablement/readiness-and-governance.md). These documents are analysis artefacts, not claims of formal UAT or enterprise deployment.
+See the [requirements and solution-design assessment](docs/business-analysis/business-requirements-and-solution-design.md) and [AI readiness / governance assessment](docs/ai-enablement/ai-readiness-and-model-governance-assessment.md). These documents are analysis artefacts, not claims of formal UAT or enterprise deployment.
 
 ### Folder guide
 

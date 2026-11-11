@@ -1,4 +1,4 @@
-# Risk Assistant — UI Style Guide
+# User Interface & Experience Design Standards — Risk Assistant
 
 Use this when adding screens, panels, or HTML fragments so new UI matches the existing compliance-dashboard look.
 
@@ -365,6 +365,6 @@ Current implementation is **visual-first** (Streamlit + HTML). When extending:
 
 ## Related docs
 
-- [frontend/README.md](../frontend/README.md) — setup, modules, runtime modes
-- [integration.md](integration.md) — API flow and report mapping
-- [architecture.md](architecture.md) — backend pipeline and report schema
+- [frontend/README.md](../../frontend/README.md) — setup, modules, runtime modes
+- [integration.md](system-integration-and-interface-specification.md) — API flow and report mapping
+- [architecture.md](solution-architecture-and-process-flows.md) — backend pipeline and report schema
