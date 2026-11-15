@@ -37,9 +37,9 @@ The project was selected as a **Top 10 finalist from 55 teams** at Agent Forge H
 - **AI/LLM integration:** OpenAI-compatible Python SDK with configurable TokenRouter, OpenRouter, or Kimi; SenseNova with Kimi fallback for memos
 - **Workflow and decision logic:** Daytona SDK sandbox integration, structured evidence processing, deterministic rule-based scoring
 
-## Enterprise-Style Documentation (Reference; Not Regulated Approval)
+## Project Documentation
 
-[Risk-screening requirements, architecture/data contracts, AI governance, security and operational assurance](docs/enterprise/README.md). These proposed controls supplement the hackathon implementation and do not claim independent screening precision or certification.
+[Reputational Risk Screening](docs/enterprise/README.md). These proposed controls supplement the hackathon implementation and do not claim independent screening precision or certification.
 
 ## Explore the Project
 
