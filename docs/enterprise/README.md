@@ -1,4 +1,4 @@
-# Reputational Risk Screening — Enterprise Reference Pack
+# Reputational Risk Screening
 
 **Document maturity:** Enterprise-style governance/operating **proposal** for the collaborative Risk Assistant hackathon prototype. The project's Top 10 placing among 55 teams is not an assurance of screening precision, regulatory certification or deployment.
 
