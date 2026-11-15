@@ -41,6 +41,6 @@ The project was selected as a **Top 10 finalist from 55 teams** at Agent Forge H
 
 - [Backend and screening workflow](backend/README.md)
 - [Frontend and user interface](frontend/README.md)
-- [Architecture and integration documentation](docs/README.md)
+- [Risk screening — business analysis, AI solution design and governance](docs/README.md)
 
 This repository is preserved as an archive of the collaborative hackathon prototype.
